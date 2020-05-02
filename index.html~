@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+	<head>
+    	<title>AID - Student Portfolio.</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <!--iso-8859-1" />-->
+		<meta http-equiv="Content-Language" content="en-us" />
+		<meta name = "author" content="AID"/>
+		<meta name ="copyright" content="&copy; 2018 AID "/>
+		<meta name="description" content="AID - Student Portfolio" />
+		<meta name="keywords" content="AID - Student Portfolio; " />
+		<meta name="robots" content="index,follow" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+    	<script src="./bootstrap/jquery/jquery-2.1.1.js"></script>
+    	<script src="./bootstrap/js/bootstrap.js"></script>
+		<link rel="stylesheet" href="./bootstrap/css/bootstrap.css">
+        <link rel="stylesheet" href="./styles/styles.css">
+	</head>
+
+	<body>
+
+        <div class = "aid_title">
+            <div class="row">
+              <div class="col-sm-4"><img src="./styles/img/aid_logo.jpg" alt="AID_logo" width=40%/></div>
+              <div class="col-sm-8">STUDENT PORTFOLIO</div>
+            </div>
+        </div>
+
+		<div class="container" style="padding:0px;margin-top:20px;">
+            <div id="portfolio" style="background-color: rgba(0, 0, 0, 0.05);border: 1px solid #e3e3e3;">
+
+                <div class = "student_info">
+                    <div class="row">
+                      <div class="col-sm-2">Name</div>
+                      <div class="col-sm-1">: </div>
+                      <div class="col-sm-9">Eklavya Mishra</div>
+                     </div>
+                     <div class="row">
+                      <div class="col-sm-2">Course</div>
+                      <div class="col-sm-1">: </div>
+                      <div class="col-sm-9">Diploma In Game Programming</div>
+                     </div>
+                     <div class="row">
+                      <div class="col-sm-2">Qualification</div>
+                      <div class="col-sm-1">: </div>
+                      <div class="col-sm-9">B.Tech CSE</div>
+                     </div>
+                     <div class="row">
+                      <div class="col-sm-2">Mobile No.</div>
+                      <div class="col-sm-1">: </div>
+                      <div class="col-sm-9">9587275750</div>
+                     </div>
+                     <div class="row">
+                      <div class="col-sm-2">E-mail</div>
+                      <div class="col-sm-1">: </div>
+                      <div class="col-sm-9">eklavyam96@gmail.com</div>
+                     </div>
+                </div>
+
+                <div class = "games_list">
+                    <h3>UNITY 3D</h3>
+                    <!--  Image Size  480x360-->
+                    <div class="row">
+                    <div class="col-sm-4">
+						<iframe width="320" height="240" src="https://www.youtube.com/embed/tgDkNt6arHk"
+								frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+								allowfullscreen></iframe>
+                        Pong
+                    </div>
+                    <div class="col-sm-4">
+						<iframe width="320" height="240" src="https://www.youtube.com/embed/YYioxWIHQH4"
+								frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+								allowfullscreen></iframe>
+                        Tiles
+                    </div>
+                    <div class="col-sm-4">
+						<iframe width="320" height="240" src="https://www.youtube.com/embed/lGXWXLBXL6I"
+								frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+								allowfullscreen></iframe>
+                        Pacman
+                    </div>
+					</div>
+					<br/><br/>
+					<div class="row">
+					<div class="col-sm-4">
+						<iframe width="320" height="240" src="https://www.youtube.com/embed/BO7QrD5WcBM"
+								frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+								allowfullscreen></iframe>
+                        Breakout 2D
+                    </div>
+					<div class="col-sm-4">
+						<iframe width="320" height="240" src="https://www.youtube.com/embed/c98sCaZ7xjI"
+								frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+								allowfullscreen></iframe>
+                        Space Shooter
+                    </div>
+					<div class="col-sm-4">
+						<iframe width="320" height="240" src="https://www.youtube.com/embed/6sxACsSMkZY"
+								frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+								allowfullscreen></iframe>
+                        Chase AI 
+                    </div>
+                    </div>
+                    <br/><br/>
+					<div class="row">
+					<div class="col-sm-4">
+						<iframe width="320" height="240" src="https://www.youtube.com/embed/inJz1SdHpWk"
+								frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+								allowfullscreen></iframe>
+                        Solitaire
+                    </div>
+					<div class="col-sm-4">
+						<iframe width="320" height="240" src="https://www.youtube.com/embed/ig9zHyFY118"
+								frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+								allowfullscreen></iframe>
+                        AR Character Animation
+                    </div>
+                    <div class="col-sm-4">
+						<iframe width="320" height="240" src="https://www.youtube.com/embed/cgNrCjw6Udg"
+								frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+								allowfullscreen></iframe>
+                        VR Walking Simulator
+                    </div>
+
+				<br/><br/>
+				<br/><br/>
+                <br/><br/>
+				<br/><br/>
+
+                <div class = "games_list">
+                    <h3>HTML5</h3>
+
+                    <div class="row">
+                    <div class="col-sm-4"><a href="html5/bubble_wars/index.html" target="_blank">
+                        <img src="html5/snapshots/bubble_wars.png" /></a>Bubble Wars</div>
+                    <div class="col-sm-4"><a href="html5/fractals/index.html" target="_blank">
+                        <img src="html5/snapshots/fractals.png" /></a>Fractals</div>
+                    <div class="col-sm-4"><a href="html5/dangerous_dave/index.html" target="_blank">
+                        <img src="html5/snapshots/dangerous_dave.png" /></a>Dangerous Dave</div>
+                    </div>
+					<br/><br/>
+                    <div class="row">
+                    <div class="col-sm-4"><a href="html5/snake/index.html" target="_blank">
+                        <img src="html5/snapshots/snake.png" /></a>Snake</div>
+                    <div class="col-sm-4"><a href="html5/space_invaders/index.html" target="_blank">
+                        <img src="html5/snapshots/space_invaders.png" /></a>Space Invaders</div>
+                    <div class="col-sm-4"><a href="html5/tiles/index.html" target="_blank">
+                        <img src="html5/snapshots/tiles.png" /></a>Tiles</div>
+                    </div>
+					<br/><br/>
+
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+	</body>
+</html>

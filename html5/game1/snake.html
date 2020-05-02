@@ -1,0 +1,878 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <!--iso-8859-1" />-->
+
+<meta http-equiv="Content-Language" content="en-us" />
+
+<meta name = "author" content="Aiga"/>
+
+<meta name ="copyright" content="&copy; 2010 AIGA "/>
+
+<meta name="description" content="AID - Student Portfolio" />
+
+<meta name="keywords" content="AID - Student Portfolio; " />
+
+<meta name="robots" content="index,follow" />
+
+<title>AID - Student Portfolio.</title>
+<link rel="stylesheet" href="../../styles/styles.css">
+<link href="../../styles/layout.css" rel="stylesheet" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<!--div id="AigaMasthead">
+
+</div-->
+<div class = "aid_title">
+            <div class="row">
+              <div class="col-sm-4"><img src="../../styles/img/aid_logo.jpg" alt="AID_logo" width=160px/></div>
+            </div>
+        </div>
+<div id="container">
+
+<div id="content">
+
+
+<!--
+    Include Scripts here
+
+
+-->
+
+<canvas id='myCanvas' width="800" height="600" style=' background-color:#FFF;'>
+</canvas>
+	 <h2>Control snake 1 using arrowkeys</h2>
+	<h2>Control snake2 by WSAD keys</h2>
+		<h2>red circle increase the length of snake by 10</h2>
+    <h2>blue circle decrease the length of snake by 7</h2>
+    <h2>white circle increase the speed of snake by 10</h2>
+    <h2>green circle decrease the speed of snake by 10</h2>
+    <script>
+        var g_canvas            = document.getElementById("myCanvas");
+        var g_context           = g_canvas.getContext("2d");
+        var g_FPS               = 30;
+        var g_timeInterval      = 1000/g_FPS ;
+        var g_time              = 0;
+		var g_move              = 0;
+        var g_tempx             = 0;
+        var g_tempy             = 0;
+        var g_sposx             = 50;
+        var g_sposy             = 50;
+        var g_startposx         = 350;
+        var g_startposy         = 250;
+        var g_settingsflag      = 0;
+        var g_homeflag          = 1;
+        var g_startgameflag     = 0;
+        var g_soundflag         = 0;
+		var g_uiflag            = 1;
+       
+        
+        function c_cell(l_r,l_x,l_y)
+        {
+            this.radius = l_r;
+            this.xpos   = l_x;
+            this.ypos   = l_y;
+           
+            
+            this.m_draw = function f_draw(l_ctx,l_c)
+            {
+                l_ctx.fillStyle = l_c;
+                l_ctx.beginPath();
+                l_ctx.arc(this.xpos,this.ypos,this.radius,0,Math.PI*2);
+                l_ctx.fill();
+                l_ctx.closePath();
+            }
+        }
+        
+        
+        
+        function c_snake(l_x,l_y)
+        {
+			this.x = l_x;
+			this.y = l_y;
+			this.r = 10;
+			this.num = 5;
+			this.maxnum = 50;
+            this.speed =5;
+			this.xspeed = this.speed;
+			this.yspeed = 0;
+			this.cellobj = new Array();
+            this.xposcell = new Array();
+            this.yposcell = new Array();
+			this.count  =0;
+			this.leftflag =0;
+			this.rightflag =0;
+			this.upflag =0;
+			this.downflag =0;
+			this.winflag =0;
+            this.start =1;
+			this.score  =0;
+            this.currentDir = 0; // 0-stop 1-left 2-right 3-up 4-down
+			
+			this.m_create_objects_of_cell = function f_create_objects_of_cell()
+            {
+				for(i=0;i<this.maxnum;i++)
+					{
+                this.cellobj[i] = new c_cell(this.r,this.x,this.y); 
+				this.x -=10;
+                    }
+				for(i=this.cellobj[0].xpos;i>this.cellobj[this.maxnum-1].xpos;i--)
+                    {
+                        this.xposcell[this.count] = i;
+						this.count++;
+                    }
+				
+				for(i=0;i<this.count;i++)
+                    {
+                        this.yposcell[i] = this.cellobj[0].ypos;
+                    }
+				
+				
+			}
+			
+			
+			this.m_drawcell = function f_drawcell(l_ctx)
+			{
+				for(i=0;i<this.num;i++)
+					{
+                        if(i==0)
+                            {
+                this.cellobj[i].m_draw(l_ctx,"blue");
+					}
+                        else{
+                          this.cellobj[i].m_draw(l_ctx,"green");  
+                        }
+                    }
+			}
+			
+            
+            
+            
+			this.m_UpdatePosArray = function m_UpdatePosArray()
+			{
+                if(this.start ==1)
+                    {
+                        
+                        if((this.currentDir == 1) && (this.rightflag == 1)) {return;}
+                        
+                        if((this.currentDir == 2) && (this.leftflag == 1)) {return;}
+                         
+                        if((this.currentDir == 3) && (this.downflag == 1)) {return;}
+                        
+                        if((this.currentDir == 4) && (this.upflag == 1)) {return;}
+                        
+                        if(this.leftflag == 1 || this.rightflag == 1 || this.upflag == 1 || this.downflag == 1 )
+                            {
+                                for(j=0;j<this.speed;j++)
+                                    {
+                                            for(i=this.xposcell.length-1;i>0;i--)
+                                                {
+                                                  this.xposcell[i] = this.xposcell[i-1];
+                                                    this.yposcell[i] = this.yposcell[i-1];
+                                                }
+
+                                            if(this.leftflag == 1)
+                                                {
+                                                  this.xposcell[0] -=1;   
+                                                    this.currentDir = 1;
+                                                }
+
+                                             if(this.rightflag == 1)
+                                                {
+                                                  this.xposcell[0] +=1;   
+                                                     this.currentDir = 2;
+                                                }
+
+                                              if(this.upflag == 1)
+                                                {
+                                                  this.yposcell[0] -=1;  
+                                                    this.currentDir = 3;
+                                                }        
+
+                                              if(this.downflag == 1)
+                                                {
+                                                  this.yposcell[0] +=1; 
+                                                    this.currentDir = 4;
+                                                }    
+                                        
+                                  
+
+
+                                }
+                            }
+                      
+				
+                    }
+            }
+            
+            this.m_UpdateCellPos = function m_UpdateCellPos()
+			{
+                if(this.start ==1)
+                    {
+                        
+                        this.count  =0;
+                        for(i=0;i<this.num;i++)
+                            {
+                                this.cellobj[i].xpos = this.xposcell[this.count];
+                                this.cellobj[i].ypos = this.yposcell[this.count];
+                                this.count  +=15;
+                            }
+				
+                    }
+            }
+        }    
+        
+		
+		
+		 function c_food(l_ctx)
+        {
+          
+          this.radius = 20;
+          this.color = "black"; 
+            this.startdraw =0;
+            
+            this.m_time = function f_time()
+            {
+              this.Xpos = Math.random()*(780 - 20)+20 ;
+              this.Ypos = Math.random()*(580 -20)+ 20;
+               this.foodnum = parseInt((Math.random()*4)+1);
+                console.log(this.foodnum);
+            }
+            
+             this.m_draw = function f_draw()
+            {
+                 if(this.startdraw == 1)
+                     {
+				  if(this.Ypos>400 || this.Ypos<200 || this.Xpos<300 || this.xpos>500)
+                    {
+                        if(this.foodnum ==1)
+                            {
+                l_ctx.fillStyle = "white";
+                l_ctx.beginPath();
+                l_ctx.arc(this.Xpos, this.Ypos, this.radius, 0,Math.PI * 2);
+                l_ctx.fill();
+                            }
+                        
+                        
+                        if(this.foodnum ==2)
+                            {
+                l_ctx.fillStyle = "green";
+                l_ctx.beginPath();
+                l_ctx.arc(this.Xpos, this.Ypos, this.radius, 0,Math.PI * 2);
+                l_ctx.fill();
+                            }
+                        
+                        
+                        
+                        if(this.foodnum ==3)
+                            {
+                l_ctx.fillStyle = "red";
+                l_ctx.beginPath();
+                l_ctx.arc(this.Xpos, this.Ypos, this.radius, 0,Math.PI * 2);
+                l_ctx.fill();
+                            }
+                        
+                        if(this.foodnum ==4)
+                            {
+                l_ctx.fillStyle = "blue";
+                l_ctx.beginPath();
+                l_ctx.arc(this.Xpos, this.Ypos, this.radius, 0,Math.PI * 2);
+                l_ctx.fill();
+                            }
+                        
+					}
+                     }
+            }
+        }
+		
+		
+		
+		function f_food_to_snake_collision()
+		{
+            if(g_food.startdraw == 1 )
+            {
+			for(i=0;i<g_snake1.num*10;i++)
+				{
+			if( g_snake1.xposcell[i] >g_food.Xpos-20 && g_snake1.xposcell[i] < g_food.Xpos+20 )
+				{
+				if(g_snake1.yposcell[i] >g_food.Ypos-20 && g_snake1.yposcell[i] < g_food.Ypos+20)
+				 {
+							 g_snake1.score+=1
+                     if(g_food.foodnum ==1)
+                         {
+                             g_snake1.speed+=10
+                         }
+                     else if(g_food.foodnum ==2)
+                         {
+									 g_snake1.score+=1
+							 if(g_snake1.speed>10)
+								 {
+                             g_snake1.speed-=10;
+								 }
+                         }
+                     else if(g_food.foodnum ==3)
+                         {
+							g_snake1.score+=1
+                             if(g_snake1.num<g_snake1.maxnum-10)
+                                 {
+                             g_snake1.num+=10
+									 
+                                 }
+                         }
+                     else if(g_food.foodnum ==4)
+                         {
+							g_snake1.score+=1
+                             if(g_snake1.num>10)
+                                 {
+                             g_snake1.num-=7
+                                 }
+                         }
+                     g_food.startdraw=0;
+                     break;
+                     console.log( g_snake1.num);
+				 }
+				}
+				}
+				
+				
+				for(i=0;i<g_snake2.num*10;i++)
+				{
+			if( g_snake2.xposcell[i] >g_food.Xpos-20 && g_snake2.xposcell[i] < g_food.Xpos+20 )
+				{
+				if(g_snake2.yposcell[i] >g_food.Ypos-20 && g_snake2.yposcell[i] < g_food.Ypos+20)
+				 {
+							 g_snake2.score+=1
+                     if(g_food.foodnum ==1)
+                         {
+                             g_snake2.speed+=10
+                         }
+                     else if(g_food.foodnum ==2)
+                         {
+							 g_snake2.score+=1
+							 if(g_snake2.speed>10)
+								 {
+                             g_snake2.speed-=10;
+								 }
+                         }
+                     else if(g_food.foodnum ==3)
+                         {
+							g_snake2.score+=1
+                             if(g_snake2.num<g_snake1.maxnum-10)
+                                 {
+                             g_snake2.num+=10;
+                                 }
+                         }
+                     else if(g_food.foodnum ==4)
+                         {
+							g_snake2.score+=1		 
+                             if(g_snake2.num>10)
+                                 {
+                             g_snake2.num-=7;
+                                 }
+                         }
+                     g_food.startdraw=0;
+                     break;
+                     console.log( g_snake1.num);
+				 }
+				}
+				}
+            }
+				
+		}
+        
+        function f_boundary_collision()
+        {
+            if(g_snake1.xposcell[0]>=g_canvas.width || g_snake1.xposcell[0]<=0)
+                {
+                    g_snake1.start =0;
+                    g_food.startdraw =0;
+                }
+            if(g_snake1.yposcell[0]>=g_canvas.height || g_snake1.yposcell[0]<=0)
+                {
+                    g_snake1.start =0;
+                    g_food.startdraw =0;
+                }
+			if(g_snake2.xposcell[0]>=g_canvas.width || g_snake2.xposcell[0]<=0)
+                {
+                    g_snake2.start =0;
+                    g_food.startdraw =0;
+                }
+            if(g_snake2.yposcell[0]>=g_canvas.height || g_snake2.yposcell[0]<=0)
+                {
+                    g_snake2.start =0;
+                    g_food.startdraw =0;
+                }
+        }
+        
+        
+        
+        
+        function f_snake_to_snake_collision()
+        {
+			for(j=0;j<g_snake1.num*10;j++)
+				{
+           for(i=j+1;i<g_snake1.num*10;i++)
+                    {
+                      if(g_snake1.xposcell[j] == g_snake1.xposcell[i] && g_snake1.yposcell[j] == g_snake1.yposcell[i])
+                          {  
+                          
+                            g_snake1.start =0;
+                             g_food.startdraw =0;
+                              break;
+                              
+                          }
+                        
+                    }
+				}  
+			
+			
+			
+			for(j=0;j<g_snake2.num*10;j++)
+				{
+           for(i=j+1;i<g_snake2.num*10;i++)
+                    {
+                      if(g_snake2.xposcell[j] == g_snake2.xposcell[i] && g_snake2.yposcell[j] == g_snake2.yposcell[i])
+                          {  
+                          
+                            g_snake2.start =0;
+                             g_food.startdraw =0;
+                              break;
+                              
+                          }
+                        
+                    }
+				}
+		}
+			
+			function f_snake2_to_snake1_collision()
+		    {
+			for(j=0;j<g_snake2.num*10;j++)
+				{
+           for(i=0;i<g_snake1.num*10;i++)
+                    {
+					if(g_snake2.xposcell[j] == g_snake1.xposcell[i] && g_snake2.yposcell[j] == g_snake1.yposcell[i])
+                          {  
+                          
+							g_snake1.winflag =1;
+							  console.log(g_snake1.winflag);
+                            g_snake2.start =0;
+							g_snake1.start =0;
+                             g_food.startdraw =0;
+                              break;
+                              
+                          }	
+					}
+				}
+		       }
+			
+			
+			
+			function f_snake1_to_snake2_collision()
+		    {
+			for(j=0;j<g_snake1.num*10;j++)
+				{
+           for(i=0;i<g_snake2.num*10;i++)
+                    {
+					if(g_snake1.xposcell[j] == g_snake2.xposcell[i] && g_snake1.yposcell[j] == g_snake2.yposcell[i])
+                          {  
+                          
+							g_snake2.winflag =2;
+							  console.log(g_snake2.winflag);
+                            g_snake2.start =0;
+							g_snake1.start =0;
+                             g_food.startdraw =0;
+                              break;
+                              
+                          }	
+					}
+				}
+                 }
+		
+		
+		
+		
+		
+		
+		
+         function f_keyDown(e)
+       {
+           console.log(e.keyCode); 
+           if(e.keyCode == 37)
+               {
+                g_snake1.leftflag =1;
+               }
+           if(e.keyCode == 39)
+               {
+                    g_snake1.rightflag = 1;
+               }  
+           if(e.keyCode == 38 )
+               {
+                  g_snake1.upflag =1;
+               }
+           if(e.keyCode == 40 )
+               {
+                  g_snake1.downflag = 1;
+               }
+		    if(e.keyCode == 87)
+               {
+                g_snake2.upflag =1;
+               }
+           if(e.keyCode == 65)
+               {
+                    g_snake2.leftflag = 1;
+               }  
+           if(e.keyCode == 68 )
+               {
+                  g_snake2.rightflag =1;
+               }
+           if(e.keyCode == 83 )
+               {
+                  g_snake2.downflag = 1;
+               }
+       }
+		
+		
+		
+           function f_keyup(e)
+       {
+           console.log(e.keyCode); 
+           if(e.keyCode == 37)
+               {
+                g_snake1.leftflag =0;
+                   
+               }
+           if(e.keyCode == 39)
+               {
+                    g_snake1.rightflag = 0;
+               }  
+           if(e.keyCode == 38 )
+               {
+                  g_snake1.upflag =0;
+                
+               }
+           if(e.keyCode == 40 )
+               {
+               
+                  g_snake1.downflag = 0;
+               }
+		    if(e.keyCode == 87)
+               {
+                g_snake2.upflag =0;
+               }
+           if(e.keyCode == 65)
+               {
+                   g_snake2.leftflag = 0;
+               }  
+           if(e.keyCode == 68 )
+               {
+                  g_snake2.rightflag =0;
+               }
+           if(e.keyCode == 83 ) 
+               {
+                  g_snake2.downflag = 0;
+			   }
+               
+		   
+       }
+		
+		
+		function f_winner()
+		{
+			if(g_snake1.start == 0 || g_snake2.start ==0 )
+				{
+					if(g_snake1.score>g_snake2.score)	
+					{
+					g_context.fillStyle ="green";
+					g_context.font = "30px Arial";
+					g_context.fillText("GAME OVER" + "<br>" +"player 1 winnes:"+ g_snake1.score ,400,300);
+						
+				     }
+					if(g_snake1.score<g_snake2.score)	
+					{
+					g_context.fillStyle ="green";
+					g_context.font = "30px Arial";
+					g_context.fillText("GAME OVER" + "<br>" +"player 2 winnes:"+ g_snake2.score ,400,300);
+						
+				     }
+					else{
+					g_context.fillStyle ="green";
+					g_context.font = "30px Arial";
+					g_context.fillText("both players score equal points" ,400,300);
+					}
+				}
+		}
+        
+        
+        function f_clearCanvas()
+        {
+            g_context.clearRect(0,0,g_canvas.width,g_canvas.height);
+			g_context.fillStyle ="black";
+            g_context.fillRect(0,0,g_canvas.width,g_canvas.height);
+			g_context.fillStyle ="red";
+			g_context.font = "30px Arial";
+            g_context.fillText("snake2 score:" + g_snake2.score ,590,50);
+			 g_context.fillText("snake1 score:" + g_snake1.score ,50,50);
+			if(g_snake1.start == 0 || g_snake2.start ==0 )
+				{
+					if(g_snake1.score>g_snake2.score)	
+					{
+					g_context.fillStyle ="green";
+					g_context.font = "30px Arial";
+					g_context.fillText("GAME OVER" + " " +"player 1 winnes:"+ g_snake1.score ,200,300);
+						
+				     }
+					else if(g_snake1.score<g_snake2.score)	
+					{
+					g_context.fillStyle ="green";
+					g_context.font = "30px Arial";
+					g_context.fillText("GAME OVER" + " " +"player 2 winnes:"+ g_snake2.score ,200,300);
+						
+				     }
+					else{
+					g_context.fillStyle ="green";
+					g_context.font = "30px Arial";
+					g_context.fillText("both players score equal points" ,200,300);
+					}
+				}
+        } 
+         
+		
+		function f_draw()
+        {
+          if(g_homeflag == 1)
+              {
+               
+                g_context.font = "30px Arial";
+                g_context.fillStyle="red";
+                g_context.fillText("Main Menu",350,150)
+
+               
+                g_context.fillStyle = "red";
+                g_context.fillRect(g_startposx,g_startposy,150,50); 
+                g_context.font = "30px Arial";
+                g_context.fillStyle="green";
+                g_context.fillText("Start",390,285)
+              }
+
+
+           if(g_startgameflag == 1 && g_homeflag ==0 && g_settingsflag == 0)
+             {
+                 g_context.fillStyle = "white";
+                g_context.fillRect(g_sposx,g_sposy,150,50); 
+                g_context.font = "20px Arial";
+                g_context.fillStyle="red";
+                g_context.fillText("Home",90,80)
+              
+                  g_uiflag=0;
+            
+             }  
+        }
+        
+        function f_mouseclick(l_event)
+        {
+			 console.log("x"+l_event.clientX);
+			 console.log("y" +l_event.clientY);
+             g_tempx = l_event.clientX-400;
+             g_tempy = l_event.clientY-150;
+			 console.log("x"+g_tempx);
+			 console.log("y" +  g_tempy);
+          
+        }
+        
+        
+        
+        function f_check_click()
+        {
+            if(g_tempx >g_sposx && g_tempx < g_sposx+150 )
+                {
+                if(g_tempy >g_sposy && g_tempy < g_sposy+50)
+                    {
+                         if(g_settingsflag == 1 )
+                            {
+                             g_homeflag =1;  
+                              g_settingsflag =0;
+                             g_startgameflag = 0;
+                            }
+                       if(g_startgameflag == 1 &&  g_homeflag == 0)
+                            {
+                                 g_uiflag =0;
+                               
+                            }
+                        if(g_homeflag == 1 )
+                            {
+                                g_settingsflag =1;
+                                g_homeflag =0;
+                              g_startgameflag = 0;
+                            }
+                        
+                    }
+                }
+            
+            
+            
+            if(g_tempx >g_startposx && g_tempx < g_startposx+150 )
+                {
+                if(g_tempy >g_startposy && g_tempy < g_startposy+50)
+                    {
+                        if(g_homeflag == 1 )
+                            {
+                                g_settingsflag =0;
+                                g_startgameflag =1;
+                                g_homeflag =0;
+                            }
+                        else if(g_settingsflag == 1 && g_soundflag == 0)
+                            {
+                              g_soundflag = 1;
+                              window.localStorage.setItem("key",g_soundflag)
+                              g_soundflag = parseInt(window.localStorage.getItem("key"))
+                              console.log(g_soundflag)
+                            }
+                    }
+                }
+           
+        }
+        
+        
+         function f_clearCanvas1()
+        {
+            g_context.clearRect(0,0,g_canvas.width,g_canvas.height);
+            g_context.fillStyle = "black";
+            g_context.fillRect(0,0,g_canvas.width,g_canvas.height);
+        } 
+         
+		
+		
+        function f_gameloop()
+        {
+			if(g_uiflag ==1)
+				{
+					 f_check_click();
+          f_clearCanvas1(); 
+          f_draw();
+				}
+			else{
+			g_time++;
+            
+			if(g_snake1.start ==1)
+				{
+			 f_snake1_to_snake2_collision();
+				}
+			if(g_snake2.start ==1)
+				{
+			 f_snake2_to_snake1_collision();
+				}
+	        g_snake1.m_UpdatePosArray();
+		    g_snake2.m_UpdatePosArray();
+            f_boundary_collision();
+            g_snake1.m_UpdateCellPos();
+		    g_snake2.m_UpdateCellPos();
+            f_snake_to_snake_collision();
+            f_food_to_snake_collision();
+			f_winner();
+			if(g_time ==1  && g_snake1.start ==1)
+				{
+                  g_food.startdraw=1;
+		          g_food.m_time();
+				}
+			else if( g_time % 150 == 0  && g_snake1.start ==1)
+				{
+                     g_food.startdraw=1;
+					 g_food.m_time();
+				}
+			
+            f_clearCanvas();
+            g_snake1.m_drawcell(g_context);
+			g_snake2.m_drawcell(g_context);
+            g_food.m_draw();
+        }
+		}
+        var g_snake1 = new c_snake(100,100); 
+		g_snake1.m_create_objects_of_cell();
+	    var g_snake2 = new c_snake(700,500); 
+		g_snake2.m_create_objects_of_cell();
+		var  g_food = new c_food(g_context);
+        setInterval(f_gameloop,g_timeInterval) ;
+        document.addEventListener("keydown",f_keyDown);
+        document.addEventListener("keyup",f_keyup);
+		document.addEventListener("mousedown",f_mouseclick);
+        
+    </script>
+  
+<!--
+    Include Scripts here
+
+    
+
+-->
+    
+    
+    
+
+<br /><br />
+
+
+
+<h3>Objective:</h3>
+
+<ul>
+
+    <li>The objective of the game is to successfully collect maximum points ,player who collects maximum points  wins.</li>
+
+    <li>points are randomly generated and each point has special powers.</li>
+    
+    <li>The game gets over when a player collide with eachother or with walls .</li>
+    
+</ul>
+
+<br /><br />
+
+<h3>Logic Design and Implementation:</h3> 
+
+<ul>
+<li>Use circle objects to create snakes under the snake class.</li>
+
+<li>Write proper logics for snake movements on the hit of arrow keys or W,S,A,D keys.</li>
+
+<li>Maintain a separate food class which changes the color of points and decides the power of each color.</li>
+
+<li>Create logics to determine when the snakes collide with the food.</li>
+
+<li>Create variables to hold the scores and display it on the screen.</li>
+
+<li>Create logics to determine when the game is over and display it on the screen.</li>
+
+</ul>
+
+<br /><br />
+
+<h3>Scope For Improvement:</h3>
+
+<ul><li>Implement Audio to the game.</ul>
+	<ul><li>make game looks attractive.</ul>
+<!-- <h3>Scope For Improvement:</h3>
+
+<ul><li>Implement Audio to the game.</ul>
+
+<ul><li>Adding more types of powers and more number of states for the enemies to be in.</ul> -->
+
+  </div>
+
+  <!--content-->
+
+</div> <!-- Container ends here -->
+
+<!--  Footer -->
+
+<div id="info-site">
+
+ </div>
+
+</body>
+
+</html>

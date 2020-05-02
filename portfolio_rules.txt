@@ -1,0 +1,11 @@
+
+portfolio - the rules:
+
+- please make sure ALL filenames,links and foldernames use lowercase and has no spaces in them. Use an underscore if required.
+
+- all games to be in a separate folder of its own.
+
+- Every game to have it's own index.html file.
+
+- place your portfolio submission into a "portfolio" folder under your respective names.
+

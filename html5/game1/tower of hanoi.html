@@ -1,0 +1,368 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <!--iso-8859-1" />-->
+
+<meta http-equiv="Content-Language" content="en-us" />
+
+<meta name = "author" content="Aiga"/>
+
+<meta name ="copyright" content="&copy; 2010 AIGA "/>
+
+<meta name="description" content="AID - Student Portfolio" />
+
+<meta name="keywords" content="AID - Student Portfolio; " />
+
+<meta name="robots" content="index,follow" />
+
+<title>AID - Student Portfolio.</title>
+<link rel="stylesheet" href="../../styles/styles.css">
+<link href="../../styles/layout.css" rel="stylesheet" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<!--div id="AigaMasthead">
+
+</div-->
+<div class = "aid_title">
+            <div class="row">
+              <div class="col-sm-4"><img src="../../styles/img/aid_logo.jpg" alt="AID_logo" width=160px/></div>
+            </div>
+        </div>
+<div id="container">
+
+<div id="content">
+
+
+<!--
+    Include Scripts here
+
+
+-->
+
+<canvas id='myCanvas' width="800" height="600" style=' background-color:#FFF;'>
+</canvas>
+	 <script>
+        var g_canvas            = document.getElementById("myCanvas");
+        var g_context           = g_canvas.getContext("2d");
+        var g_FPS               = 30;
+        var g_timeInterval      = 1000/g_FPS ;
+        var g_Stack_1_Xpos     = 200;
+        var g_Stack_2_Xpos     = 400;
+        var g_Stack_3_Xpos     = 600;
+        var g_RectYposArray     = [500,480,460,440,420,400,380,360,340,320];
+         var g_RectColor         = ["red","green","blue","yellow","black","red","green","blue","yellow","black"] ;
+		  var g_ClickCounter = 0;
+        var g_FirstClickedTowerIndex = 0;
+        var g_SecondClickedTowerIndex = 0;
+        var g_RectColor         = ["red","green","blue"] ;
+        var g_RectWidth         =  [133,90,38];
+        var g_TempRectObj;
+        var g_TowerObjectArray = new Array(3);
+		 var g_start=1;
+        
+        function C_ShapeRect(l_x,l_y,l_w,l_h,l_c)
+        {
+            this.Xpos = l_x ;
+            this.Ypos = l_y ;
+            this.Width = l_w ;
+            this.Height = l_h ;
+            this.Color = l_c ;
+
+            this.Draw = function m_drawRect(l_context)
+            {
+                l_context.fillStyle = this.Color ;
+                l_context.fillRect(this.Xpos , this.Ypos , this.Width , this.Height);
+                
+                
+            };
+        }
+        
+        
+        function C_Stack(l_x,l_y)
+        {
+            this.StackArray = new Array(10);
+            this.StackSize = 0;
+            this.PoppedElement;
+            this.TowerXpos = l_x;
+            this.TowerYpos = l_y;
+            this.TowerWidth = 200;
+            this.TowerHeight = 20;
+            
+            this.m_Push = function m_Push(l_Val)
+            {
+                if(this.StackSize < this.StackArray.length)
+                    {
+                        this.StackArray[this.StackSize] = l_Val;
+                        
+                        
+                        this.StackArray[this.StackSize].Xpos = this.TowerXpos+(this.TowerWidth/2) - (this.TowerHeight/2) -  (this.StackArray[this.StackSize].Width/2)+10; 
+                        
+                          
+                            
+                        this.StackArray[this.StackSize].Ypos =  this.TowerYpos -
+                            (this.StackSize+1)*this.StackArray[this.StackSize].Height;
+                        
+                        this.StackSize++; 
+                    }
+                
+            };
+            
+            this.m_Pop = function m_Pop()
+            {
+                if(this.StackSize > 0)
+                    {
+                        this.StackSize--;
+                        this.PoppedElement = this.StackArray[this.StackSize];
+                        this.StackArray[this.StackSize] = null;
+                        return this.PoppedElement;
+                    }
+                
+                return null;
+             };
+            
+            this.m_DrawTower = function m_DrawTower(l_Ctx)
+            {
+                l_Ctx.fillStyle="black";
+                l_Ctx.fillRect(this.TowerXpos,this.TowerYpos,this.TowerWidth,this.TowerHeight);
+                l_Ctx.fillRect(this.TowerXpos+(this.TowerWidth/2) - (this.TowerHeight/2),this.TowerYpos,this.TowerHeight,-this.TowerWidth);
+                
+                for(var i=0 ; i<this.StackSize ; i++)
+                {
+                    this.StackArray[i].Draw(g_context);
+                }
+
+            };
+        }
+        
+       
+        
+        
+        
+        function f_DrawTowerObjects(l_Ctx)
+        {
+            for(var i=0 ; i<g_TowerObjectArray.length ; i++)
+                {
+                    g_TowerObjectArray[i].m_DrawTower(l_Ctx);
+                }
+        }
+        
+        
+        
+       
+        
+       function f_clearCanvas()
+        {
+            g_context.clearRect(0,0,g_canvas.width,g_canvas.height);
+            g_context.strokeRect(0,0,g_canvas.width,g_canvas.height);
+        } 
+        
+      
+        
+        function f_InitTowers()
+        {
+            var l_X = 100;
+            var l_Y = 500;
+            for(var i=0 ; i<g_TowerObjectArray.length ; i++)
+                {
+                    g_TowerObjectArray[i] = new C_Stack(l_X,l_Y);
+                    l_X += 220;
+                }
+            
+            console.log(g_TowerObjectArray);
+            
+            for(var i=0 ; i<g_TowerObjectArray.length ; i++)
+                {
+                    g_TempRectObj = new C_ShapeRect(100,100,g_RectWidth[i],20,g_RectColor[i]);
+                    g_TowerObjectArray[0].m_Push(g_TempRectObj);
+                }
+           
+          
+                    
+        }
+       
+        
+        
+       
+        
+       
+        
+        
+        
+        
+        
+        
+        
+       function f_UpdateClick(l_TowerIndex)
+        {
+             g_ClickCounter++
+           if(g_ClickCounter == 1)
+               {
+                   g_FirstClickedTowerIndex = l_TowerIndex;
+               }
+           else if(g_ClickCounter == 2)
+               {
+                   g_SecondClickedTowerIndex = l_TowerIndex;
+               }
+        }
+        
+        function f_UpdateStackBasedOnClick()
+        {
+            if(g_ClickCounter >=2)
+                {
+					 g_TempRectObj = g_TowerObjectArray[g_FirstClickedTowerIndex].m_Pop();
+				if(g_TowerObjectArray[g_SecondClickedTowerIndex].StackSize>0)
+					{
+					
+                    if( g_TowerObjectArray[g_SecondClickedTowerIndex].StackArray[g_TowerObjectArray[g_SecondClickedTowerIndex].StackSize-1].Width>g_TempRectObj.Width)
+						{
+						if(g_TempRectObj != null)
+							{
+						     g_TowerObjectArray[g_SecondClickedTowerIndex].m_Push(g_TempRectObj);
+							}
+						}
+					else
+						{
+							 g_TowerObjectArray[g_FirstClickedTowerIndex].m_Push(g_TempRectObj);
+						}
+					}
+					else
+						{
+							if(g_TempRectObj != null)
+							{
+						     g_TowerObjectArray[g_SecondClickedTowerIndex].m_Push(g_TempRectObj);
+							}
+						}
+						
+						
+                    
+                    g_ClickCounter = 0;
+                }
+        }
+		 function f_gameover()
+		 {
+			 if( g_TowerObjectArray[1].StackSize>2 ||  g_TowerObjectArray[2].StackSize>2)
+				 {
+					 g_start=0;
+                  g_context.font = "50px Arial";
+                  g_context.fillText("GAME OVER",250,200);  
+                
+				 }
+		 }
+        
+        
+        
+        function f_GameLoop()
+        {
+			
+			if(g_start==1)
+				{
+                 f_UpdateStackBasedOnClick();
+				}
+            f_clearCanvas() ;
+			f_gameover();
+            f_DrawTowerObjects(g_context);
+        }
+        
+        
+        
+        
+        
+        function f_mouseDown(e)
+       {
+		   console.log(e.clientX);
+               
+           if(e.clientX - 350 >(g_Stack_1_Xpos) && e.clientX-350 <(g_Stack_1_Xpos+100))
+               {
+                   console.log("Stack 1 clicked");
+                   
+                   f_UpdateClick(0);
+                      
+               }
+           
+           if(e.clientX -400>(g_Stack_2_Xpos) && e.clientX -400 <(g_Stack_2_Xpos+100))
+               {
+                   console.log("Stack 2 clicked");
+                   
+                   f_UpdateClick(1);
+               }
+           
+           if(e.clientX -400>(g_Stack_3_Xpos) && e.clientX-400 <(g_Stack_3_Xpos+100))
+               {
+                   console.log("Stack 3 clicked");
+                  
+                   f_UpdateClick(2);
+               }
+       }
+     
+        
+       
+        f_InitTowers();
+           //  console.log(g_TowerObjectArray[0].StackArray[g_TowerObjectArray[0].StackSize-1].Width);
+
+        setInterval(f_GameLoop,g_timeInterval) ;
+        document.addEventListener("mousedown",f_mouseDown)
+        
+    </script>
+<br /><br />
+
+
+
+<h3>Objective:</h3>
+
+<ul>
+
+    <li>The objective of the game is to successfully arrange the blocks to another pole.</li>
+
+    <li>A bigger block cannot be placed above a smaller one.</li>
+    
+    <li>The game gets over when the blocks are placed in second or third poles successfully.</li>
+    
+</ul>
+
+<br /><br />
+
+<h3>Logic Design and Implementation:</h3> 
+
+<ul>
+<li>Use suqare objects to generate the different shapes under the shape class.</li>
+
+<li>Write proper logics for movement of block from one pole to another based on the clickes.</li>
+
+<li>Create variables to hold the moves,time taken and display it.</li>
+
+<li>Create logics to determine when the game is over and display it on the screen.</li>
+
+</ul>
+
+<br /><br />
+
+<h3>Scope For Improvement:</h3>
+
+<ul><li>Implement Audio to the game.</ul>
+<!-- <h3>Scope For Improvement:</h3>
+
+<ul><li>Implement Audio to the game.</ul>
+
+<ul><li>Adding more types of powers and more number of states for the enemies to be in.</ul> -->
+
+  </div>
+
+  <!--content-->
+
+</div> <!-- Container ends here -->
+
+<!--  Footer -->
+
+<div id="info-site">
+
+ </div>
+
+</body>
+
+</html>

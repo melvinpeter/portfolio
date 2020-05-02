@@ -1,0 +1,421 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <!--iso-8859-1" />-->
+
+<meta http-equiv="Content-Language" content="en-us" />
+
+<meta name = "author" content="Aiga"/>
+
+<meta name ="copyright" content="&copy; 2010 AIGA "/>
+
+<meta name="description" content="AID - Student Portfolio" />
+
+<meta name="keywords" content="AID - Student Portfolio; " />
+
+<meta name="robots" content="index,follow" />
+
+<title>AID - Student Portfolio.</title>
+<link rel="stylesheet" href="../../styles/styles.css">
+<link href="../../styles/layout.css" rel="stylesheet" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<!--div id="AigaMasthead">
+
+</div-->
+<div class = "aid_title">
+            <div class="row">
+              <div class="col-sm-4"><img src="../../styles/img/aid_logo.jpg" alt="AID_logo" width=160px/></div>
+            </div>
+        </div>
+<div id="container">
+
+<div id="content">
+
+
+<!--
+    Include Scripts here
+
+
+-->
+
+<canvas id='myCanvas' width="800" height="600" style=' background-color:#FFF;'>
+</canvas>
+
+	<script>
+        var g_canvas            = document.getElementById("myCanvas");
+        var g_context           = g_canvas.getContext("2d");
+        var g_FPS               = 30;
+        var g_timeInterval      = 1000/g_FPS ;
+        var g_move              = 0;
+        var g_xpos              = 100;
+        var g_ypos              = 100;
+        var g_side              = 50;
+        var g_k                 = 0;
+        var g_start             = 0;
+        var g_count             = 0;
+        var g_t                 = 0;
+        var g_temp              = 0;
+        var g_second            = 0;
+        var g_minute            = 0;
+        var g_tempstore         = 0;
+        var g_tempx             = 0;
+        var g_tempy             = 0;
+        var g_index             = 0;
+        var g_check             = 0;
+        var g_no_of_swaps       = 0;
+        var g_select_node       = 0;
+        var g_number            = new Array();
+        var g_orginal_array     = new Array();
+        var g_nodeobjarray      = new Array();
+        var g_nearnode          = new Array(); 
+         g_number =[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,""];
+         g_orginal_array =[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,""];
+        var g_rows               = 4;
+
+       function c_node(l_x,l_y,l_s,l_d,l_i)
+        {
+            this.x    = l_x;
+            this.y    = l_y;
+            this.size = l_s;
+            this.digit= l_d;
+            this.index= l_i;
+            
+            
+            
+            this.m_draw = function f_draw(l_ctx)
+            {
+                if(this.digit == "")
+                    {
+                       l_ctx.fillRect(this.x,this.y,this.size,this.size); 
+                    }
+                else
+                {
+                l_ctx.font = "10px Arial";
+                l_ctx.fillText(this.digit,this.x+this.size/2,this.y+this.size/2);
+                l_ctx.lineWidth=2;
+                l_ctx.strokeRect(this.x,this.y,this.size,this.size);
+                 }
+            }
+        }
+        
+        
+        
+        function f_nodeobj()
+        {
+          for(i=0;i<g_rows;i++)
+              {
+                  for(j=0;j<g_rows;j++)
+                      {
+                          g_nodeobjarray[g_k] = new c_node(g_xpos,g_ypos,g_side,g_number[g_k],g_k)
+                          g_xpos = g_xpos + g_side;
+                          g_k++;
+                      }
+                  g_xpos = 100;
+                  g_ypos = g_ypos + g_side;
+
+              }
+        }
+        
+        function f_drawnode()
+        {
+            for(k=0;k<g_k;k++)
+            {
+                g_nodeobjarray[k].m_draw(g_context);
+                
+            }
+        }
+        
+        function f_swap()
+        {
+             if(g_move == 1)
+              {
+         if(g_count == 0)
+              {
+
+            
+            for(i=0;i<g_k;i++)
+                {
+                    if(g_nodeobjarray[i].digit == "")
+                        {
+                            g_temp = g_nodeobjarray[i].index;
+                            
+                           
+                        }
+                }
+                }
+                
+            
+            
+               g_nearnode[0] =g_temp -1;  
+                g_nearnode[1] =g_temp +1;
+                g_nearnode[2] =g_temp -g_rows;
+                 g_nearnode[3] =g_temp + g_rows;
+         
+            for(j=0;j<4;j++)
+                {
+                    if(g_nearnode[j] >0 && g_nearnode[j]<g_k)
+                        {
+                    if(g_tempx>g_nodeobjarray[g_nearnode[j]].x && g_tempx<g_nodeobjarray[g_nearnode[j]].x+g_side)
+                        {
+                    if(g_tempy>g_nodeobjarray[g_nearnode[j]].y && g_tempy<g_nodeobjarray[g_nearnode[j]].y+g_side)
+                        {
+                            
+                           g_tempstore = g_nodeobjarray[g_nearnode[j]];
+                            g_nodeobjarray[g_nearnode[j]] = g_nodeobjarray[g_temp];
+                            g_nodeobjarray[g_temp] = g_tempstore;
+                            
+                            
+                            g_tempstore = g_nodeobjarray[g_nearnode[j]].x;
+                            g_nodeobjarray[g_nearnode[j]].x = g_nodeobjarray[g_temp].x;
+                            g_nodeobjarray[g_temp].x = g_tempstore;
+                            
+                            
+                             g_tempstore = g_nodeobjarray[g_nearnode[j]].y;
+                            g_nodeobjarray[g_nearnode[j]].y = g_nodeobjarray[g_temp].y;
+                            g_nodeobjarray[g_temp].y = g_tempstore;
+                            
+
+                            
+                             
+                            g_temp = g_nodeobjarray[g_temp].index;
+                            
+                            
+                             console.log(g_temp);
+                        
+                            
+                        
+                            
+                           g_count++;
+                            g_move =0;
+                        }
+                        }
+                }
+                }
+              }
+                
+                            
+                            
+
+           g_context.font = "30px Arial";
+            g_context.fillText("moves :"+g_count,100,50);
+                
+        }
+        
+      function f_Gameover()
+        {
+            for(i=0;i<g_orginal_array.length;i++)
+                {
+                    if( g_nodeobjarray[i].digit == g_orginal_array[i] )
+                        {
+                            g_check =0;
+                        }
+                    else
+                    {
+                       g_check =1; 
+						break;
+                    }
+                }
+            if(g_check == 0)
+                {
+            //console.log(g_check);
+                    g_start = 0;
+                   g_context.font = "30px Arial";
+                  g_context.fillText("GAME OVER",300,400);  
+                }
+        }
+        
+        function f_calculatetime()
+        {
+            if(g_start ==1)
+                {
+             g_t++;
+            if(g_t == 30)
+                {
+                    g_second++;
+                    g_t=0;
+                    if(g_second == 60)
+                        {
+                            g_second=0;
+                            g_minute++
+                        }
+                }
+                }
+            g_context.font = "30px Arial";
+            g_context.fillText("time:" + g_minute +":" + g_second,600,50);
+        }
+        
+         function f_mouseclick(l_event)
+        {
+			 console.log("x"+l_event.clientX);
+			 console.log("y" +l_event.clientY);
+             g_tempx = l_event.clientX-400;
+             g_tempy = l_event.clientY-140;
+			 console.log("x"+g_tempx);
+			 console.log("y" +  g_tempy);
+ 
+            g_start =1;
+            g_move=1;
+         
+        }
+        
+        
+         function f_clearCanvas()
+        {
+            g_context.clearRect(0,0,g_canvas.width,g_canvas.height);
+            g_context.strokeRect(0,0,g_canvas.width,g_canvas.height);
+        } 
+        
+        
+        function f_sequence_generater()
+        {
+            g_no_of_swaps =5; //parseInt(Math.random()*10);
+           g_temp = g_k -1; 
+            
+           for(i=0;i<=g_no_of_swaps;i++)
+               {
+				   if(g_temp==1 ||g_temp==5 || g_temp==9|| g_temp==13)
+					   {
+						   g_nearnode[0] =0;  
+						    g_nearnode[1] =g_temp +1;
+							g_nearnode[2] =g_temp -g_rows;
+							g_nearnode[3] =g_temp + g_rows;
+					   }
+				    if(g_temp==4 ||g_temp==8 || g_temp==12)
+					   {
+						   g_nearnode[0] =g_temp -1;  
+						    g_nearnode[1] =0;
+							g_nearnode[2] =g_temp -g_rows;
+							g_nearnode[3] =g_temp + g_rows;
+					   }
+				   else{
+					   
+						g_nearnode[0] =g_temp -1;  
+						g_nearnode[1] =g_temp +1;
+						g_nearnode[2] =g_temp -g_rows;
+						g_nearnode[3] =g_temp + g_rows;
+				   }
+                 g_select_node = parseInt(Math.random()*4);
+                    if(g_nearnode[g_select_node] >0 && g_nearnode[g_select_node]<g_k-1)
+                        {
+                          g_tempstore = g_nodeobjarray[g_nearnode[g_select_node]].digit;
+                            g_nodeobjarray[g_nearnode[g_select_node]].digit = g_nodeobjarray[g_temp].digit;
+                            g_nodeobjarray[g_temp].digit = g_tempstore;            
+                             
+                            g_temp = g_nodeobjarray[g_nearnode[g_select_node]].index;
+                        }
+				   else
+					   {
+						   for(j=0;j<4;j++)
+							   {
+								    g_select_node = parseInt(Math.random()*4);
+								if(g_nearnode[g_select_node] >0 && g_nearnode[g_select_node]<g_k-1)
+									{
+									  g_tempstore = g_nodeobjarray[g_nearnode[g_select_node]].digit;
+										g_nodeobjarray[g_nearnode[g_select_node]].digit = g_nodeobjarray[g_temp].digit;
+										g_nodeobjarray[g_temp].digit = g_tempstore;            
+
+										g_temp = g_nodeobjarray[g_nearnode[g_select_node]].index;
+										break;
+									}
+								  
+							   }
+					   }
+                }
+        }
+            
+        
+        
+        
+        
+        function f_gameloop()
+        {
+          f_clearCanvas(); 
+          f_Gameover();
+            f_swap();
+           f_calculatetime(); 
+          f_drawnode();
+        }
+          f_nodeobj();
+         f_sequence_generater();
+          setInterval(f_gameloop,g_timeInterval) ;
+        document.addEventListener("click",f_mouseclick);
+        
+        
+            </script>
+  
+<!--
+    Include Scripts here
+
+    
+
+-->
+    
+    
+    
+
+<br /><br />
+
+
+
+<h3>Objective:</h3>
+
+<ul>
+
+    <li>The objective of the game is to rearrange the nodes in correct order.</li>
+
+    <li>Nearby nodes can be swapped.</li>
+
+    <li>Rearrange it in minimum time and moves.</li>
+    
+    <li>The game gets over when the last node is placed properly.</li>
+    
+</ul>
+
+<br /><br />
+
+<h3>Logic Design and Implementation:</h3> 
+
+<ul>
+<li>Use node objects to generate the grid for game.</li>
+
+<li>Write proper logics for identifying clickes and swapping of nodes.</li>
+
+<li>Create variables to hold the time ,moves and display it on the screen.</li>
+
+<li>Create logics to determine when the game is over and display it on the screen.</li>
+
+</ul>
+
+<br /><br />
+
+<h3>Scope For Improvement:</h3>
+
+<ul><li>Implement Audio to the game.</ul>
+<!-- <h3>Scope For Improvement:</h3>
+
+<ul><li>Implement Audio to the game.</ul>
+
+<ul><li>Adding more types of powers and more number of states for the enemies to be in.</ul> -->
+
+  </div>
+
+  <!--content-->
+
+</div> <!-- Container ends here -->
+
+<!--  Footer -->
+
+<div id="info-site">
+
+ </div>
+
+</body>
+
+</html>
