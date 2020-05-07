@@ -51,6 +51,7 @@
 	<script>
         var g_canvas            = document.getElementById("myCanvas");
         var g_context           = g_canvas.getContext("2d");
+	 var g_canvasBounds      = g_canvas.getBoundingClientRect();
         var g_FPS               = 30;
         var g_timeInterval      = 1000/g_FPS ;
         var g_move              = 0;
@@ -253,12 +254,12 @@
         
          function f_mouseclick(l_event)
         {
-			 console.log("x"+l_event.clientX);
-			 console.log("y" +l_event.clientY);
-             g_tempx = l_event.clientX-400;
-             g_tempy = l_event.clientY-140;
-			 console.log("x"+g_tempx);
-			 console.log("y" +  g_tempy);
+			 //console.log("x"+l_event.clientX);
+			 //console.log("y" +l_event.clientY);
+             g_tempx = l_event.clientX-g_canvasBounds.left;
+             g_tempy = l_event.clientY-g_canvasBounds.top;
+			 //console.log("x"+g_tempx);
+			 //console.log("y" +  g_tempy);
  
             g_start =1;
             g_move=1;

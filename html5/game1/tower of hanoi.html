@@ -50,6 +50,7 @@
 	 <script>
         var g_canvas            = document.getElementById("myCanvas");
         var g_context           = g_canvas.getContext("2d");
+		  var g_canvasBounds      = g_canvas.getBoundingClientRect();
         var g_FPS               = 30;
         var g_timeInterval      = 1000/g_FPS ;
         var g_Stack_1_Xpos     = 200;
@@ -277,7 +278,7 @@
        {
 		   console.log(e.clientX);
                
-           if(e.clientX - 350 >(g_Stack_1_Xpos) && e.clientX-350 <(g_Stack_1_Xpos+100))
+           if(e.clientX -g_canvasBounds.left >(g_Stack_1_Xpos-100) && e.clientX-g_canvasBounds.left <(g_Stack_1_Xpos+100))
                {
                    console.log("Stack 1 clicked");
                    
@@ -285,14 +286,14 @@
                       
                }
            
-           if(e.clientX -400>(g_Stack_2_Xpos) && e.clientX -400 <(g_Stack_2_Xpos+100))
+           if(e.clientX -g_canvasBounds.left>(g_Stack_2_Xpos-100) && e.clientX -g_canvasBounds.left <(g_Stack_2_Xpos+100))
                {
                    console.log("Stack 2 clicked");
                    
                    f_UpdateClick(1);
                }
            
-           if(e.clientX -400>(g_Stack_3_Xpos) && e.clientX-400 <(g_Stack_3_Xpos+100))
+           if(e.clientX -g_canvasBounds.left>(g_Stack_3_Xpos-100) && e.clientX-g_canvasBounds.left <(g_Stack_3_Xpos+100))
                {
                    console.log("Stack 3 clicked");
                   
