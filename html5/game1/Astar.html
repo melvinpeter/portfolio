@@ -1,0 +1,508 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <!--iso-8859-1" />-->
+
+<meta http-equiv="Content-Language" content="en-us" />
+
+<meta name = "author" content="Aiga"/>
+
+<meta name ="copyright" content="&copy; 2010 AIGA "/>
+
+<meta name="description" content="AID - Student Portfolio" />
+
+<meta name="keywords" content="AID - Student Portfolio; " />
+
+<meta name="robots" content="index,follow" />
+
+<title>AID - Student Portfolio.</title>
+<link rel="stylesheet" href="../../styles/styles.css">
+<link href="../../styles/layout.css" rel="stylesheet" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<!--div id="AigaMasthead">
+
+</div-->
+<div class = "aid_title">
+            <div class="row">
+              <div class="col-sm-4"><img src="../../styles/img/aid_logo.jpg" alt="AID_logo" width=160px/></div>
+            </div>
+        </div>
+<div id="container">
+
+<div id="content">
+
+
+<!--
+    Include Scripts here
+
+
+-->
+
+<canvas id='myCanvas' width="800" height="600" style=' background-color:#FFF;'>
+</canvas>
+
+	<script>
+        var g_canvas = document.getElementById("myCanvas");
+        var g_context = g_canvas.getContext("2d");
+        var g_canvasBounds      = g_canvas.getBoundingClientRect();
+        var g_gridheight = 10;
+        var g_gridWidth = 10;
+        var g_gridArray = new Array(g_gridheight*g_gridWidth);
+        var g_gridSquareSize = 50;
+        var g_startflag = 0;
+        var g_endflag = 0;
+        var g_obstacleflag = 0;
+        var g_runFlag = 0;
+        var g_startIndex = null;
+        var g_endIndex = null;
+        var g_openList = [];
+        var g_closeList = [];
+        
+        var numFrames = 30;
+        var timeInterval = 1000/numFrames;
+        
+        //var g_mouseX = 0;
+        //var g_mouseY = 0;
+        
+        
+        function C_gridSquare(index,xpos,ypos,size)
+        {
+            this.xPos = xpos;
+            this.yPos = ypos;
+            this.size = size;
+            this.Index = index;
+            this.ParentIndex = null;
+            this.color = 0;
+            this.gVal = 0;
+            this.huristic = 0;
+            this.fVal = this.gVal + this.huristic;
+            this.start = 0;  //type 1-start 2 end 3-obs
+            this.end = 0;
+            this.obstacle = 0;
+            this.close = 0;
+            
+            this.draw = function draw(l_context)
+            {
+                if (this.color != 0)//((this.start)||(this.end)||(this.obstacle))
+                    {
+                        l_context.fillStyle = this.color;
+                        l_context.fillRect(this.xPos,this.yPos,this.size,this.size);
+                        l_context.strokeRect(this.xPos,this.yPos,this.size,this.size);
+                    }
+                else
+                {
+                    l_context.strokeRect(this.xPos,this.yPos,this.size,this.size);
+                }
+            }
+            
+        }
+        
+        function f_initialize(l_gridheight,l_gridWidth,l_squareSize)
+        {
+            var l_indx = 1;
+            for (var i = 1; i <= l_gridheight; i++)
+                {
+                    for (var j = 1; j <= l_gridWidth; j++)
+                        {
+                            g_gridArray[l_indx] = new C_gridSquare(l_indx,l_squareSize*j,l_squareSize*i,l_squareSize);
+                            l_indx += 1;
+                        }
+                }
+        }
+        //f_initialize(g_gridheight,g_gridWidth,g_gridSquareSize);
+        
+        function f_drawGrid(l_context)
+        {
+            for (var i = 1; i<g_gridArray.length; i++)
+                {
+                    g_gridArray[i].draw(l_context);
+                }
+        }
+        
+        function f_drawText(l_context)
+        {
+            l_context.font = "17px Comic Sans MS";
+            l_context.fillStyle = "red";
+            l_context.fillText("pressHold (S:start),(E:end),(O:Obstrical) and click the Grid, after selecting press Enter to run.",20,20);
+        }
+        
+        function f_clearCanvas(l_canvas,l_context)
+        {
+            l_context.clearRect(0,0,l_canvas.width,l_canvas.height);
+            l_context.strokeRect(0,0,l_canvas.width,l_canvas.height);
+        }
+        
+        function f_calculateHeuristic(l_Index1,l_Index2)
+        {
+            var l_index1 = l_Index1;
+            var l_index2 = l_Index2;
+            if (l_Index1 > l_Index2)
+                {
+                    l_index1 = l_Index2;
+                    l_index2 = l_Index1;
+                }
+            var l_difference = l_index2 - l_index1;
+            var l_distance = (l_index2 - 1)%g_gridWidth;
+            
+            var l_cfirstIndx = l_index2 - l_distance;
+            var l_result = 0;
+            while (l_cfirstIndx > l_index1)
+                {
+                    l_cfirstIndx -= g_gridWidth;
+                }
+            //console.log(l_cfirstIndx,l_distance);
+            if(l_index1 + ((l_difference)%g_gridWidth) == l_cfirstIndx+l_distance)
+                {
+                    l_result = ((l_difference)%g_gridWidth)+parseInt((l_difference)/g_gridWidth);
+                }
+            else
+                {
+                    l_result = parseInt((l_difference)/g_gridWidth)+(g_gridWidth-(l_difference)%g_gridWidth)+1;
+                }
+            //console.log(l_result);
+            return l_result;
+        }
+        //f_calculateHeuristic(10,18);
+        
+        function f_findChildrenNodes(l_parentNodeIndx)
+        {
+            l_childrenNodes = [];
+            //console.log(g_gridArray[l_parentNodeIndx].xPos);
+            l_childrenNodes.push(f_checkGridSquare(g_gridArray[l_parentNodeIndx].xPos-10,g_gridArray[l_parentNodeIndx].yPos+10)); //left node
+            l_childrenNodes.push(f_checkGridSquare(g_gridArray[l_parentNodeIndx].xPos+10+g_gridSquareSize,g_gridArray[l_parentNodeIndx].yPos+10)); //right node
+            l_childrenNodes.push(f_checkGridSquare(g_gridArray[l_parentNodeIndx].xPos+10,g_gridArray[l_parentNodeIndx].yPos-10)); //up node
+            l_childrenNodes.push(f_checkGridSquare(g_gridArray[l_parentNodeIndx].xPos+10,g_gridArray[l_parentNodeIndx].yPos+10+g_gridSquareSize)); //down node
+            //console.log(l_childrenNodes);
+            for(var i = 0; i < l_childrenNodes.length; i++)
+                {
+                    if((l_childrenNodes[i] == undefined)||(g_gridArray[l_childrenNodes[i]].close)||(g_gridArray[l_childrenNodes[i]].obstacle))
+                       {
+                            l_childrenNodes.splice(i,1);
+                           i -= 1;
+                        }
+                    else
+                        {
+                            g_gridArray[l_childrenNodes[i]].ParentIndex = l_parentNodeIndx;
+                            g_gridArray[l_childrenNodes[i]].huristic =f_calculateHeuristic(g_gridArray[l_childrenNodes[i]].Index,g_endIndex);//(g_gridArray[l_childrenNodes[i]].xPos-g_gridArray[g_endIndex].xPos)+
+								//(g_gridArray[l_childrenNodes[i]].yPos-g_gridArray[g_endIndex].yPos);
+                            g_gridArray[l_childrenNodes[i]].gVal =10 * f_calculateHeuristic(g_gridArray[l_childrenNodes[i]].Index,g_startIndex);//(|g_gridArray[g_startIndex].xPos-g_gridArray[l_childrenNodes[i]].xPos|)+(|g_gridArray[g_startIndex].yPos-g_gridArray[l_childrenNodes[i]].yPos|);
+                            g_gridArray[l_childrenNodes[i]].fVal = g_gridArray[l_childrenNodes[i]].huristic + g_gridArray[l_childrenNodes[i]].gVal;
+                            g_gridArray[l_childrenNodes[i]].close = 1;
+                        }
+                }
+            //console.log(l_childrenNodes);
+            return l_childrenNodes;
+        }
+        
+        //f_findChildrenNodes(25);
+        
+        function f_colorThePath(l_Index)
+        {
+				
+            l_index = l_Index;
+            while(g_gridArray[l_index].Index != g_startIndex)
+                {
+                    g_gridArray[l_index].color = "blue";
+                    l_index = g_gridArray[l_index].ParentIndex;
+                }
+        }
+        
+        
+        function f_searchShortestPath()
+        {
+            if((g_runFlag)&&(g_startIndex)&&(g_endIndex))
+               {
+                   //console.log("run");
+                   if (g_openList.length == 0)
+                       {
+                           g_openList.push(g_startIndex);
+                       }
+                   console.log(g_openList[0]);
+                   var l_childrenList = f_findChildrenNodes(g_openList[0]);
+                   console.log(l_childrenList);
+                   console.log(g_openList);
+                   //g_gridArray[g_openList[0]].close = 1;
+                   g_closeList.push(g_gridArray[g_openList[0]].Index);
+                   g_openList.splice(0,1);
+                   if (l_childrenList != 0)
+                       {
+                           if(g_openList.length == 0)
+                               {
+                                   g_openList.push(l_childrenList[0]);
+                                   l_childrenList.splice(0,1);
+                               }
+                           for(var i = 0; i < l_childrenList.length; i++)
+                               {
+                                   var l_index = null;
+                                   for(var j = 0; j < g_openList.length; j++)
+                                       {
+                                           if(g_gridArray[g_openList[j]].fVal > g_gridArray[l_childrenList[i]].fVal)
+                                           {
+                                               l_index = j;
+                                               //g_openList.splice(j,0,l_childrenList[i]);
+                                               break
+                                           }
+                                       }
+                                   if(l_index == null)
+                                       {
+                                           g_openList.splice(j+1,0,l_childrenList[i]);
+                                       }
+                                   else
+                                       {
+                                           g_openList.splice(l_index,0,l_childrenList[i]);
+                                       }
+                               }
+                       }
+                   
+                       
+                   if (g_gridArray[g_openList[0]].huristic == 1)
+                   {
+                       //console.log(g_openList[0],g_gridArray[g_openList[0]].huristic,g_gridArray[g_openList[0]].gVal);
+                       f_colorThePath(g_openList[0]);
+                       g_runFlag = 0;
+                   }
+                   /*if ((l_childrenList.length == 0) && (g_openList.length == 0))
+                       {
+                           console.log("path is blocked");
+                           g_runFlag = 0;
+                       }*/
+               }
+        }
+        
+        
+        function f_GameLoop()
+        {
+            //f_CheckGridClick(g_mouseX,g_mouseY,g_gridArray);
+            f_searchShortestPath();
+            f_clearCanvas(g_canvas,g_context);
+            f_drawGrid(g_context);
+            f_drawText(g_context);
+            
+        }
+        
+        
+        function f_checkGridSquare(mouseX,mouseY)
+        {
+            for (var i = 1; i < g_gridArray.length; i++)
+                {
+                    if ((mouseX >= g_gridArray[i].xPos && mouseX <= g_gridArray[i].xPos+g_gridSquareSize)&&(mouseY >= g_gridArray[i].yPos && mouseY <= g_gridArray[i].yPos+g_gridSquareSize))
+                        {
+                            return i;
+                        }
+                }
+        }
+        
+        function f_resetStartFlags()
+        {
+            for (var i = 1; i<g_gridArray.length; i++)
+                {
+                    g_gridArray[i].start = 0;
+                    if (g_gridArray[i].color == "green")
+                        {
+                            g_gridArray[i].color = 0;
+                        }
+                }
+        }
+        
+        function f_resetEndFlags()
+        {
+            for (var i = 1; i<g_gridArray.length; i++)
+                {
+                    g_gridArray[i].end = 0;
+                    if (g_gridArray[i].color == "brown")
+                        {
+                            g_gridArray[i].color = 0;
+                        }
+                }
+        }
+        
+        
+        function f_CheckGridClick(mouseX,mouseY,g_gridArray)
+        {
+            if ((mouseX >= g_gridSquareSize && mouseX <= g_gridWidth*g_gridSquareSize+g_gridSquareSize )&&(mouseY >= g_gridSquareSize && mouseY <= g_gridheight*g_gridSquareSize+g_gridSquareSize))
+                {
+                    //console.log("clicked in grid");
+                    var l_index = f_checkGridSquare(mouseX,mouseY);
+                    //console.log("index = ",l_index);
+                    if (g_obstacleflag)
+                        {
+                            if(g_gridArray[l_index].obstacle)
+                                {
+                                    g_gridArray[l_index].obstacle = 0;
+                                    g_gridArray[l_index].color = 0;
+                                }
+                            else
+                            {
+                                g_gridArray[l_index].start = 0;
+                                g_gridArray[l_index].end = 0;
+                                g_gridArray[l_index].obstacle = 1;
+                                g_gridArray[l_index].color = "red";
+                            }
+                        }
+                    if (g_startflag)
+                        {
+                            if(g_gridArray[l_index].start)
+                                {
+                                    g_gridArray[l_index].start = 0;
+                                    g_gridArray[l_index].color = 0;
+                                    g_startIndex = null;
+                                }
+                            else
+                                {
+                                    f_resetStartFlags();
+                                    g_gridArray[l_index].end = 0;
+                                    g_gridArray[l_index].obstacle = 0;
+                                    g_gridArray[l_index].start = 1;
+                                    g_gridArray[l_index].color = "green";
+                                    g_startIndex = l_index;
+                                }
+                        }
+                    if (g_endflag)
+                        {
+                            if(g_gridArray[l_index].end)
+                                {
+                                    g_gridArray[l_index].end = 0;
+                                    g_gridArray[l_index].color = 0;
+                                    g_endIndex = null;
+                                }
+                            else
+                                {
+                                    f_resetEndFlags();
+                                    g_gridArray[l_index].obstacle = 0;
+                                    g_gridArray[l_index].start = 0;
+                                    g_gridArray[l_index].end = 1;
+                                    g_gridArray[l_index].color = "brown";
+                                    g_endIndex = l_index;
+                                }
+                            
+                        }
+                }
+            /*else 
+                {
+                    
+                }*/
+        }
+        
+        function f_mouseDown(e)
+        {
+            //console.log("--")
+            //g_mouseX = e.clientX;
+            //g_mouseY = e.clientY;
+            f_CheckGridClick(e.clientX- g_canvasBounds.left,e.clientY-g_canvasBounds.top,g_gridArray);
+        }
+        
+        function f_keyDownEventHandler(eventData)// o=79,s=83,e=69
+        {
+            if (eventData.keyCode == 79)
+            {
+                //console.log("0 is pressed");//,g_gridArray.length); 
+                g_obstacleflag = 1;
+            }
+            else if (eventData.keyCode == 83)
+                {
+                    g_startflag = 1;
+                }
+            else if (eventData.keyCode == 69)
+                {
+                    g_endflag = 1;
+                }
+        }
+        
+        function f_keyUpEventHandler(eventData)// o=79,s=83,e=69,enter=13
+        {
+            if (eventData.keyCode == 79)
+            {
+                //console.log("0 is pressed");//,g_gridArray.length); 
+                g_obstacleflag = 0;
+            }
+            else if (eventData.keyCode == 83)
+                {
+                    g_startflag = 0;
+                }
+            else if (eventData.keyCode == 69)
+                {
+                    g_endflag = 0;
+                }
+            else if (eventData.keyCode == 13)
+                {
+                    g_runFlag = 1;
+                }
+        }
+        
+        f_initialize(g_gridheight,g_gridWidth,g_gridSquareSize);
+        
+        
+        var id = setInterval(f_GameLoop,timeInterval);
+     
+        document.addEventListener("mousedown",f_mouseDown);
+        document.addEventListener("keydown",f_keyDownEventHandler);
+        document.addEventListener("keyup",f_keyUpEventHandler);
+    </script>
+  
+<!--
+    Include Scripts here
+
+    
+
+-->
+    
+    
+    
+
+<br /><br />
+
+
+
+<h3>Objective:</h3>
+
+<ul>
+
+    <li>The objective of this algoritham is to find the shortest distance between two nodes.</li>
+    
+    <li>The algoritham shows the path when it fins it.</li>
+    
+</ul>
+
+<br /><br />
+
+<h3>Logic Design and Implementation:</h3> 
+
+<ul>
+<li>Use node objects to generate the grid for game.</li>
+
+<li>Write proper logics for identifying the neighboring nodes and nearest amoung them .</li>
+
+<li>Create logics to determine when the game is over and display it on the screen.</li>
+
+</ul>
+
+<br /><br />
+
+<!-- <h3>Scope For Improvement:</h3>
+
+<ul><li>Implement Audio to the game.</ul>
+
+<ul><li>Adding more types of powers and more number of states for the enemies to be in.</ul> -->
+
+  </div>
+
+  <!--content-->
+
+</div> <!-- Container ends here -->
+
+<!--  Footer -->
+
+<div id="info-site">
+
+ </div>
+
+</body>
+
+</html>

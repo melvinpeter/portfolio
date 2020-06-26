@@ -1,0 +1,1189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <!--iso-8859-1" />-->
+
+<meta http-equiv="Content-Language" content="en-us" />
+
+<meta name = "author" content="Aiga"/>
+
+<meta name ="copyright" content="&copy; 2010 AIGA "/>
+
+<meta name="description" content="AID - Student Portfolio" />
+
+<meta name="keywords" content="AID - Student Portfolio; " />
+
+<meta name="robots" content="index,follow" />
+
+<title>AID - Student Portfolio.</title>
+<link rel="stylesheet" href="../../styles/styles.css">
+<link href="../../styles/layout.css" rel="stylesheet" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<!--div id="AigaMasthead">
+
+</div-->
+<div class = "aid_title">
+            <div class="row">
+              <div class="col-sm-4"><img src="../../styles/img/aid_logo.jpg" alt="AID_logo" width=160px/></div>
+            </div>
+        </div>
+<div id="container">
+
+<div id="content">
+
+
+<!--
+    Include Scripts here
+
+
+-->
+
+<canvas id='myCanvas' width="800" height="600" style=' background-color:#FFF;'>
+</canvas>
+  <script>
+        var g_canvas            = document.getElementById("myCanvas");
+        var g_context           = g_canvas.getContext("2d");
+        var g_FPS               = 30;
+        var g_timeInterval      = 1000/g_FPS ;
+        var g_count             =0;
+       var g_dave_xpos  =40;
+		var g_dave_ypos =530;
+		var g_elementxpos   =0;
+		var g_movemap_right=0;
+		var g_movemap_left=0;
+        var g_num   =0;
+        var g_right_frame_limit =450;
+        var g_left_frame_limit =200;
+        var g_frame_start_xpos = 0;
+        var g_frame_start_ypos =g_canvas.height;
+        var g_velocity =-10;
+        var g_initialvelocity =g_velocity;
+        var g_gravity =.3;
+        var g_gravity_xpos_speed=.5;
+        var g_blocksbitmap      = new Array();
+        var g_backgroundobjarray      = new Array();
+		var g_collidedTile =0;
+		var g_IsdaveOnGround =1;
+		var g_gravityflag =1;
+		var g_ready_to_jump=1;
+		var g_jumpflag=0;
+		var g_map_reached_right=0;
+		var g_map_reached_left=0;
+		var g_spider_up_flag=0;
+		var g_spider_down_flag=0;
+		var g_spider_left_flag=0;
+		var g_spider_right_flag=0;
+		var g_dave_ready_shoot =0;
+		var g_spider_shoot =1;
+		var g_dave_shoot=0;
+		var g_dave_bullet_x=0;
+		var g_dave_bullet_y=0;
+		var g_start=1;
+		
+		
+		
+        var g_blockimg             = new Image();
+        g_blockimg.src = 'img/redTile.png';
+        var g_platformtile             = new Image();
+        g_platformtile.src = 'img/platformTile.png'
+        var g_reddiamond             = new Image();
+        g_reddiamond.src = 'img/redDiamonds.png';
+        var g_bluediamond             = new Image();
+        g_bluediamond.src = 'img/Diamonds.png';
+         
+        var g_cup             = new Image();
+        g_cup.src = 'img/cup2.png';
+        var g_fire  =  new Array();
+        var g_fire1             = new Image();
+        g_fire1.src = 'img/fire4.png';
+        var g_fire2             = new Image();
+        g_fire2.src = 'img/fire2.png';
+        var g_fire3             = new Image();
+        g_fire3.src = 'img/fire1.png';
+        g_fire =[g_fire1,g_fire3,g_fire2];
+        var g_water             = new Image();
+        g_water.src = 'img/water1.png';
+        var g_water2             = new Image();
+        g_water2.src = 'img/water2.png';
+        var g_water3             = new Image();
+        g_water3.src = 'img/water3.png';
+        var g_sphere             = new Image();
+        g_sphere.src = 'img/sphere.png';
+        
+		var g_gun     = new Image();
+        g_gun.src = 'img/gun.png';
+		var g_bullet     = new Image();
+        g_bullet.src = 'img/monsterbullet.png';
+        
+        var g_door             = new Image();
+        g_door.src = 'img/door.png';
+        var g_weed  = new Array();
+        var g_weed0  = new Image();
+        g_weed0.src = 'img/weed1.png';
+        var g_weed1  = new Image();
+        g_weed1.src = 'img/weed2.png';
+        var g_weed2  = new Image();
+        g_weed2.src = 'img/weed3.png';
+        g_weed =[g_weed0,g_weed1,g_weed2];
+		
+		
+		var g_dave_forward = new Array();
+		var g_dave1 = new Image();
+		g_dave1.src = 'img/dave1.png' ;
+		var g_dave2 = new Image();
+        g_dave2.src = 'img/dave3.png' ;
+        var g_dave3 = new Image();
+		g_dave3.src = 'img/dave4.png' ;
+        g_dave_forward = [g_dave1,g_dave2,g_dave3];
+		
+		var g_dave_backward = new Array();
+		var g_dave4 = new Image();
+		g_dave4.src = 'img/dave5.png' ;
+        var g_dave5 = new Image();
+		g_dave5.src = 'img/dave6.png' ;
+		var g_dave6 = new Image();
+		g_dave6.src = 'img/dave7.png' ;
+        g_dave_backward = [g_dave4,g_dave5,g_dave6];
+		
+		
+		var g_explosion = new Array();
+		var g_explosion1 =new Image();
+		g_explosion1.src = 'img/explosion1.png' ;
+		var g_explosion2 =new Image();
+		g_explosion2.src = 'img/explosion2.png';
+		g_explosion = [g_explosion1,g_explosion2]
+	
+		
+        
+         g_blocksbitmap             =         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+          1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,1,1,
+          1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+          1,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+          1,2,2,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,1,1,0,1,1,0,0,0,0,1,14,14,14,14,0,0,14,14,0,14,14,14,0,0,	1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,1,14,0,0,14,0,14,0,0,0,14,0,0,14,0,
+          1,0,2,2,2,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,1,14,0,0,14,0,14,0,0,0,14,0,0,14,0,		1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,0,0,1,14,14,14,14,0,14,0,0,0,14,0,14,14,0,     1,0,0,0,0,0,0,2,2,2,2,0,0,0,1,0,2,2,2,2,2,2,2,0,1,1,0,0,1,0,0,1,0,0,0,0,0,1,0,0,1,14,0,0,0,0,14,0,0,0,14,14,0,0,0,         1,0,0,0,0,0,0,0,0,1,0,7,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,1,1,0,12,1,0,0,0,0,0,1,0,0,1,14,0,0,0,0,14,0,0,0,14,0,14,0,0,         1,0,0,0,0,0,0,0,0,1,0,2,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,1,0,0,1,0,0,1,0,1,1,14,0,0,0,0,0,14,14,0,14,0,0,14,0,         1,0,0,0,2,2,0,0,3,1,0,0,0,0,1,0,4,4,4,4,4,4,4,0,1,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,             1,0,0,0,0,0,0,0,0,1,0,0,0,5,1,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,0,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+          1,0,0,0,0,0,0,0,0,1,0,0,2,2,1,0,0,0,0,0,0,0,0,0,1,0,0,0,1,12,0,0,0,0,1,0,0,0,1,12,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+          1,1,1,6,6,6,6,6,6,1,6,6,6,6,1,9,10,11,11,10,10,9,9,10,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,6,6,6,6,6,6,6,6,6,6,6,6,6,6];
+        
+        
+        function c_elements(l_x,l_y,l_s,l_t,l_img)
+        {
+            this.x = l_x;
+			this.y = l_y;
+			this.s = l_s;
+            this.type = l_t;
+            this.img =l_img;
+			this.framecounter = 0;
+			this.i =0;
+			this.speed =3;
+            this.isalive= 1;
+			
+
+			this.m_draw = function m_draw(l_ctx)
+			{
+                if(this.isalive ==1)
+                    {
+				if(this.type == 6 || this.type ==14)
+					{
+					    l_ctx.drawImage(this.img[this.i],this.x,this.y,this.s,this.s);
+						if(this.framecounter % 10 ==0 || this.framecounter ==0)
+							{
+								this.i++;
+							}
+						if(this.i >2)
+							{
+								this.i =0;
+							}
+					   	
+					}
+				else
+				{
+                      l_ctx.drawImage(this.img,this.x,this.y,this.s,this.s);
+				}
+                        
+                    }
+                 this.framecounter++;
+        
+            }
+                
+                
+		}
+        
+        
+		
+		  
+        function c_dave(l_x,l_y,l_s,l_img1,l_img2,l_img3)
+        {
+            this.x = l_x;
+			this.y = l_y;
+			this.s = l_s;
+            this.img_forward = l_img1;
+            this.img_backward = l_img2;
+			this.explosion = l_img3;
+			this.framecounter = 0;
+			this.moveright =0;
+			this.moveleft =0;
+			this.moveup =0;
+			this.movedown =0;
+			this.state=0;
+			this.isalive=1;
+			this.i =0;
+            this.j =0;
+			this.a =0;
+			this.d =0;
+			this.moveleftflag=1;
+			this.moverightflag =1;
+			this.speed =3;
+            this.direction =1;
+			
+
+			this.m_draw = function m_draw(l_ctx)
+			{
+				if(this.isalive ==1)
+                    {
+                 if(this.direction ==1 )
+                     {
+						
+						if(this.state ==1)
+							{
+								if(this.moveup == 1 ||this.movedown ==1)
+									{
+										 l_ctx.drawImage(this.img_forward[1],this.x,this.y,this.s,this.s);
+									}
+                                else if(this.moveright ==1)
+                                {
+						
+								l_ctx.drawImage(this.img_forward[this.i],this.x,this.y,this.s,this.s);
+								if(this.framecounter % 2 == 0)
+									{
+										this.i++;
+									}
+								if(this.i >2)
+									{
+										this.i =0;
+									}
+							}
+                            }
+                        if(this.state ==0)
+                                    {
+								         l_ctx.drawImage(this.img_forward[0],this.x,this.y,this.s,this.s);
+                                        
+                                    }
+						
+						
+							}
+                    
+                    
+                        if(this.direction == 0)
+                            {
+						      if(this.state ==1)
+									{
+								if(this.moveup == 1 ||this.movedown ==1)
+									{
+										 l_ctx.drawImage(this.img_backward[1],this.x,this.y,this.s,this.s);
+									}
+                       
+                                    else if(this.moveleft ==1)
+                                        {
+										l_ctx.drawImage(this.img_backward[this.j],this.x,this.y,this.s,this.s);
+										if(this.framecounter % 2 ==0)
+											{
+												this.j++;
+											}
+										if(this.j >2)
+											{
+												this.j =0;
+											}
+									}
+                                    }
+                                if(this.state ==0)
+                                    {
+								         l_ctx.drawImage(this.img_backward[0],this.x,this.y,this.s,this.s);
+                                        
+                                    }
+							}
+					}
+							if(this.isalive ==0 && this.d<3)
+								{
+										l_ctx.drawImage(this.explosion[this.a],this.x,this.y,this.s,this.s);
+										if(this.framecounter % 15==0)
+											{
+												this.a++;
+											}
+										if(this.a >1)
+											{
+												this.a =0;
+												//this.isalive=1;
+												//this.x=l_x;
+												//this.y =l_y;
+											}
+									if(this.framecounter % 30==0)
+											{
+												this.d++;
+												
+											}
+					             }
+                this.framecounter++;
+			
+            }
+        }
+			
+          
+		
+		function c_spider(l_x,l_y,l_s,l_ex,l_img)
+		{
+			this.xpos=l_x;
+			this.ypos=l_y;
+			this.isalive=1
+			this.size=l_s;
+			this.explosion=l_ex;
+			this.img=l_img;
+			this.speed=20;
+			
+			
+			this.m_draw = function m_draw(l_ctx)
+			{
+				if(this.isalive==1)
+					{
+				      l_ctx.drawImage(this.img,this.xpos,this.ypos,this.size,this.size);
+					}
+			}
+		}
+		
+        
+        
+            
+            function f_init_elements(l_xpos,l_ypos,l_row,l_column,l_bitmap)
+            {
+                g_xpos = l_xpos;
+             for(i=0;i<l_row;i++)
+					{
+						for(j=0;j<l_column;j++)
+							{
+                                if(l_bitmap[g_num] == 0)
+                                    {
+                                       g_num++;
+								       g_xpos += 40; 
+                                    }
+                                else
+                                {    
+                                 if(l_bitmap[ g_num] == 1)
+                                     {
+								       g_backgroundobjarray[g_count] = new c_elements(g_xpos,l_ypos,40,1,g_blockimg);
+								       g_count++;
+                                       g_num++;
+                                     }
+                                
+                                else if(l_bitmap[ g_num] == 2)
+                                     {
+								    g_backgroundobjarray[g_count] = new c_elements(g_xpos,l_ypos,40,2,g_platformtile);
+								    g_count++;
+                                          g_num++;
+                                     }
+                                
+                               else if(l_bitmap[ g_num] == 3)
+                                     {
+								    g_backgroundobjarray[g_count] = new c_elements(g_xpos,l_ypos,30,3,g_reddiamond);
+								   g_count++;
+                                          g_num++;
+                                     }
+                                
+                               else if(l_bitmap[ g_num] == 4)
+                                     {
+								    g_backgroundobjarray[g_count] = new c_elements(g_xpos,l_ypos,30,4,g_bluediamond);
+								   g_count++;
+                                          g_num++;
+                                     }
+                                
+                                else if(l_bitmap[ g_num] == 5)
+                                     {
+								    g_backgroundobjarray[g_count] = new c_elements(g_xpos,l_ypos,20,5,g_cup);
+								   g_count++;
+                                          g_num++;
+                                     }
+                                
+                                else if(l_bitmap[ g_num] == 6)
+                                     {
+								    g_backgroundobjarray[g_count] = new c_elements(g_xpos,l_ypos,40,6,g_fire);
+								   g_count++;
+                                          g_num++;
+                                     }
+								else if(l_bitmap[ g_num] == 7)
+                                     {
+								    g_backgroundobjarray[g_count] = new c_elements(g_xpos+10,l_ypos+10,20,7,g_gun);
+								   g_count++;
+                                          g_num++;
+                                     }
+                                
+                               
+                                    else if(l_bitmap[ g_num] == 9)
+                                     {
+								    g_backgroundobjarray[g_count] = new c_elements(g_xpos,l_ypos,40,9,g_water);
+								     g_count++;
+                                          g_num++;
+                                     }
+                                    else if(l_bitmap[ g_num] == 10)
+                                     {
+								    g_backgroundobjarray[g_count] = new c_elements(g_xpos,l_ypos,40,10,g_water2);
+								     g_count++;
+                                          g_num++;
+                                     }
+                                    else if(l_bitmap[ g_num] == 11)
+                                     {
+								    g_backgroundobjarray[g_count] = new c_elements(g_xpos,l_ypos,40,11,g_water3);
+								     g_count++;
+                                          g_num++;
+                                     }
+                                    else if(l_bitmap[ g_num] == 12)
+                                     {
+								    g_backgroundobjarray[g_count] = new c_elements(g_xpos,l_ypos,30,12,g_sphere);
+								   g_count++;
+                                          g_num++;
+                                     }
+                                    else if(l_bitmap[ g_num] == 13)
+                                     {
+								    g_backgroundobjarray[g_count] = new c_elements(g_xpos,l_ypos,40,13,g_door);
+								   g_count++;
+                                          g_num++;
+                                     }
+                                     else if(l_bitmap[ g_num] == 14)
+                                     {
+								    g_backgroundobjarray[g_count] = new c_elements(g_xpos,l_ypos,40,14,g_weed);
+								   g_count++;
+                                          g_num++;
+                                     }
+                                
+								g_xpos += 40;
+                                }
+							}
+						g_xpos = l_xpos;
+						l_ypos += 40;
+					}
+               
+            }
+            		
+             function f_keyDown(e)
+              {
+                  
+                   if(e.keyCode == 37)
+                       {
+                        g_daveobj.direction =0;
+                        g_daveobj.moveleft=1;
+						g_daveobj.state=1;
+						//g_daveobj.moverightflag=1;
+						   
+                       }
+                  if(e.keyCode == 39)
+                       {
+                       g_daveobj.direction =1;
+						g_daveobj.moveright=1;
+						g_daveobj.state=1;
+						//g_daveobj.moveleftflag=1;
+                       }
+				  if(e.keyCode == 38)
+                       {
+                        g_daveobj.moveup=1;
+						  // g_daveobj.moverightflag=1;
+						  // g_daveobj.moveleftflag=1;  
+                       }
+				  if(e.keyCode == 32)
+                       {
+						   if(g_dave_ready_shoot==1)
+							   {
+						   g_dave_shoot =1;
+							   }
+					   }
+				   /*if(e.keyCode == 40)
+                       {
+                        g_daveobj.movedown=1;
+						  // g_daveobj.moverightflag=1;
+						  // g_daveobj.moveleftflag=1;
+					
+						   
+                       }*/
+                 
+              }
+        function f_keyup(e)
+              {
+                   if(e.keyCode == 37)
+                       {
+                        g_daveobj.moveleft=0;
+						g_daveobj.state=0;
+                       }
+                  if(e.keyCode == 39)
+                       {
+                         
+						  g_daveobj.moveright=0;
+						  g_daveobj.state=0;
+                       }
+				   /*if(e.keyCode == 38)
+                       {
+                        g_daveobj.moveup=0;
+						  g_daveobj.moverightflag=1;
+						   g_daveobj.moveleftflag=1;
+					
+						   
+                       }
+				   if(e.keyCode == 40)
+                       {
+                        g_daveobj.movedown=0;
+						  g_daveobj.moverightflag=1;
+						   g_daveobj.moveleftflag=1;
+					
+						   
+                       }*/
+				 
+              }
+            
+            function f_draw_map()
+             {
+                
+                 for(i=0;i<g_count;i++)
+                    {
+                             g_backgroundobjarray[i].m_draw(g_context);    
+                        
+                    }
+            }
+             
+		
+		
+                    
+        
+                
+        function f_clearcanvas()
+        {
+            g_context.clearRect(0,0,g_canvas.width,g_canvas.height);
+            g_context.fillStyle="white";
+            g_context.fillRect(0,0,g_canvas.width,g_canvas.height);
+        
+        }
+        
+        function f_move_map()
+        {
+				  if(g_daveobj.moveright ==1 && g_movemap_right ==1)
+					  {
+						  if(g_daveobj.x>=g_right_frame_limit)
+							{ 
+							   for(i=0;i<g_count;i++)
+								{
+										   g_backgroundobjarray[i].x-=g_backgroundobjarray[i].speed;
+								}
+								  g_spiderobj.xpos-=g_spiderobj.speed;
+							             f_dave_tile_collision("r");
+					         }
+			           }
+			
+				if(g_daveobj.moveleft ==1 && g_movemap_left ==1)
+					  {
+						if(g_daveobj.x<=g_left_frame_limit)
+						{ 
+                           
+							for(j=0;j<g_count;j++)
+						    	{
+								   g_backgroundobjarray[j].x+=g_backgroundobjarray[j].speed;
+								}
+							 g_spiderobj.xpos+=g_spiderobj.speed;
+									 f_dave_tile_collision("l");
+					    }
+			          }      
+        }
+		
+		function f_move_spider()
+		{
+			if(g_spiderobj.xpos<=g_backgroundobjarray[188].x && g_spider_right_flag==0)
+				{
+				 g_spiderobj.xpos=	g_backgroundobjarray[188].x;
+				 g_spiderobj.ypos+=1;
+				g_spider_down_flag=1;	
+				g_spider_up_flag=0;	
+					
+				}
+			if(g_spiderobj.ypos>=g_backgroundobjarray[188].y - g_spiderobj.size && g_spider_up_flag==0)
+				{
+				 g_spiderobj.ypos=	g_backgroundobjarray[188].y - g_spiderobj.size;
+				 g_spiderobj.xpos+=1;
+					g_spider_right_flag=1;
+					g_spider_left_flag=0;
+					
+					
+			
+				}
+			if(g_spiderobj.xpos>=g_backgroundobjarray[194].x-g_spiderobj.size && g_spider_left_flag==0)
+				{
+				 g_spiderobj.xpos=	g_backgroundobjarray[194].x;
+				 g_spiderobj.ypos-=1;
+					g_spider_up_flag=1;
+					g_spider_down_flag=0;
+					
+			
+				}
+			if(g_spiderobj.ypos<=g_backgroundobjarray[194].y- 200 && g_spider_down_flag==0)
+				{
+				 g_spiderobj.ypos=	g_backgroundobjarray[194].y-200;
+				 g_spiderobj.xpos-=1;
+					g_spider_left_flag=1;
+					g_spider_right_flag=0;
+					
+			
+				}
+			
+		}
+        
+		
+		function f_move_dave()
+		{
+			if(g_daveobj.moveright == 1 )
+              {
+               //if(g_daveobj.moverightflag ==1)
+				   {
+					   if(g_daveobj.x>=g_right_frame_limit && g_map_reached_right ==0)
+						   {
+							   //if(!Map reached the edge){
+							   g_daveobj.x=g_right_frame_limit;
+							   //move map left
+								//  }
+							  
+							   //
+							   g_movemap_right =1; 
+							  
+						   }
+					   else
+					   {
+                        g_daveobj.x+=g_daveobj.speed;   
+					   }
+					   f_dave_tile_collision("r");
+				   }  
+              }
+			
+			if(g_daveobj.moveleft == 1 )
+              {
+               //if(g_daveobj.moveleftflag ==1)
+				   {
+					   if(g_daveobj.x<=g_left_frame_limit && g_map_reached_left ==0)
+						   {
+							   //g_daveobj.moveleftflag=0;
+							   g_daveobj.x=g_left_frame_limit;
+                               g_movemap_left =1; 
+							   
+						   }
+					   else
+					   {
+                         g_daveobj.x-=g_daveobj.speed;
+						   
+					   }
+					   f_dave_tile_collision("l");
+				   }
+              }
+			
+			
+			
+          
+          
+		}
+        
+        function f_map_collision()
+        {
+            if( g_backgroundobjarray[54].x<=g_canvas.width)
+                {
+                  g_movemap_right =0; 
+					//g_daveobj.moverightflag=1;
+					g_map_reached_right=1;
+					
+                }
+			if( g_backgroundobjarray[0].x>0)
+                {
+                    g_movemap_left =0; 
+					//g_daveobj.moveleftflag=1;
+					g_map_reached_left=1;
+                }
+           
+        }
+		
+		function f_bullete_tile_collision()
+		{
+			if(g_bulletobj.isalive==1)
+				{
+					 for(i=0;i<g_count;i++)
+                    {
+                        if(g_backgroundobjarray[i].isalive==1)
+                            {
+								if((g_bulletobj.x+g_bulletobj.s>g_backgroundobjarray[i].x && g_bulletobj.x+g_bulletobj.s<g_backgroundobjarray[i].x+g_backgroundobjarray[i].s) || (g_bulletobj.x>g_backgroundobjarray[i].x && g_bulletobj.x<g_backgroundobjarray[i].x+g_backgroundobjarray[i].s) )
+									{
+										if((g_bulletobj.y+g_bulletobj.s>g_backgroundobjarray[i].y && g_bulletobj.y+g_bulletobj.s<g_backgroundobjarray[i].y+g_backgroundobjarray[i].s)||(g_bulletobj.y>g_backgroundobjarray[i].y && g_bulletobj.y<g_backgroundobjarray[i].y+g_backgroundobjarray[i].s))
+										{
+											g_bulletobj.isalive=0;
+										}
+									}
+							}
+			     	}
+		      }
+		}
+		
+		
+        
+        function f_dave_tile_collision(l_input)
+        {
+		//if(g_daveobj.moveleft == 1 || g_daveobj.moveright == 1 ||  g_daveobj.moveup == 1  )
+				{
+                 for(i=0;i<g_count;i++)
+                    {
+                        if(g_backgroundobjarray[i].isalive==1)
+                            {		
+							if(l_input == "d" )
+								{
+						if(g_gravityflag == 1|| g_daveobj.movedown == 1)
+							{
+						       if(g_daveobj.x<g_backgroundobjarray[i].x+g_backgroundobjarray[i].s &&  g_daveobj.x>g_backgroundobjarray[i].x  ||
+										((g_daveobj.x+g_daveobj.s)<g_backgroundobjarray[i].x+g_backgroundobjarray[i].s  &&  (g_daveobj.x+g_daveobj.s)> g_backgroundobjarray[i].x) )
+							      {
+                                   if(g_daveobj.y+g_daveobj.s< g_backgroundobjarray[i].y+g_backgroundobjarray[i].s && g_daveobj.y+g_daveobj.s> g_backgroundobjarray[i].y)
+                                      {
+										  //disable gravity
+											 g_collidedTile = i;
+										   if( g_backgroundobjarray[g_collidedTile].type == 1|| g_backgroundobjarray[g_collidedTile].type == 2)
+							                     {
+                                                   g_daveobj.y =g_backgroundobjarray[i].y-g_daveobj.s;
+													  g_daveobj.moveup =0;
+										            g_daveobj.movedown =0;
+													 g_jumpflag=0;
+													 g_ready_to_jump=1;
+                                                       g_initialvelocity=g_velocity;
+                                                      g_IsdaveOnGround = 1;
+												 }
+												 
+                                         //g_gravityflag = 0;
+										 
+										  
+												 
+											  // console.log("down"+g_collidedTile);
+                                            //return;
+                                            break;
+									  }
+									  else
+									  {
+										   g_IsdaveOnGround = 0;
+										 
+										   //g_gravityflag =1;
+										  
+									  }
+								  }
+							}
+								}
+								
+								
+								
+								
+						if(l_input == "l" )
+							{
+                                if(g_daveobj.x<g_backgroundobjarray[i].x+g_backgroundobjarray[i].s &&  g_daveobj.x>g_backgroundobjarray[i].x)
+                                    {
+                                     if(g_daveobj.y< g_backgroundobjarray[i].y+g_backgroundobjarray[i].s && g_daveobj.y> g_backgroundobjarray[i].y ||
+										((g_daveobj.y+g_daveobj.s)<g_backgroundobjarray[i].y+g_backgroundobjarray[i].s  &&  (g_daveobj.y+g_daveobj.s)> g_backgroundobjarray[i].y))
+                                        {
+											g_collidedTile = i;
+											 if( g_backgroundobjarray[g_collidedTile].type == 1|| g_backgroundobjarray[g_collidedTile].type == 2)
+							                     {
+											 g_daveobj.x =g_backgroundobjarray[i].x+g_backgroundobjarray[i].s;
+												 }
+											//console.log("left"+g_collidedTile);
+											 //g_dave_collide_left == 1;
+											//return;
+                                         break;
+                                            
+                                        }
+										
+                                    }
+								
+								
+								
+							}
+							
+						
+						if(l_input == "r" )
+							{
+						        if((g_daveobj.x+g_daveobj.s) > g_backgroundobjarray[i].x &&  
+								   (g_daveobj.x+g_daveobj.s)<(g_backgroundobjarray[i].x+g_backgroundobjarray[i].s) )
+                                    {
+                                     if( (g_daveobj.y<g_backgroundobjarray[i].y+g_backgroundobjarray[i].s  &&  g_daveobj.y> g_backgroundobjarray[i].y)||
+										((g_daveobj.y+g_daveobj.s)<g_backgroundobjarray[i].y+g_backgroundobjarray[i].s  &&  (g_daveobj.y+g_daveobj.s)> g_backgroundobjarray[i].y)
+									   )
+                                        {
+										 g_collidedTile = i;
+											 if( g_backgroundobjarray[g_collidedTile].type == 1|| g_backgroundobjarray[g_collidedTile].type == 2)
+							                     {
+                                          g_daveobj.x =g_backgroundobjarray[i].x-g_daveobj.s;
+												 }
+											//console.log("right"+g_collidedTile);
+											//return;
+                                          break; 
+                                            
+                                        }
+                                    }
+							}
+							
+						if(l_input == "u"  )
+							{
+					     	 if(g_daveobj.x<g_backgroundobjarray[i].x+g_backgroundobjarray[i].s &&  g_daveobj.x>g_backgroundobjarray[i].x ||
+										((g_daveobj.x+g_daveobj.s)<g_backgroundobjarray[i].x+g_backgroundobjarray[i].s  &&  (g_daveobj.x+g_daveobj.s)> g_backgroundobjarray[i].x) )
+                                {
+                                 if(g_backgroundobjarray[i].y < g_daveobj.y && g_backgroundobjarray[i].y+g_backgroundobjarray[i].s> g_daveobj.y)
+                                   {
+										   g_collidedTile = i;
+									    if( g_backgroundobjarray[g_collidedTile].type == 1|| g_backgroundobjarray[g_collidedTile].type == 2)
+							                     {
+                                                  g_initialvelocity =-g_initialvelocity;
+                                                    g_daveobj.y =g_backgroundobjarray[i].y+g_backgroundobjarray[i].s;
+												 }
+									   //console.log("up"+g_collidedTile);
+                                            break;
+									    //g_dave_collide_up == 1;
+                                            
+                                        }
+									
+                                }
+							}
+							
+						
+								
+								/*if(g_daveobj.movedown == 1 )
+									{
+										//enable gravity
+										
+				             	      g_daveobj.y+=g_gravity;
+				
+									}*/
+								 	
+								//if(! IsdaveOnGround) //enable gravity
+								  
+							
+									
+					}
+                    }
+					//console.log(g_collidedTile);
+					
+					     if( g_backgroundobjarray[g_collidedTile].type == 6|| g_backgroundobjarray[g_collidedTile].type == 9 || g_backgroundobjarray[g_collidedTile].type == 10|| g_backgroundobjarray[g_collidedTile].type == 11)
+							 {
+							   g_daveobj.isalive =0;
+							   g_daveobj.d =0;
+								 g_collidedTile=0;
+                               
+						     }
+					if( g_backgroundobjarray[g_collidedTile].type == 3|| g_backgroundobjarray[g_collidedTile].type == 4 || g_backgroundobjarray[g_collidedTile].type ==5 || g_backgroundobjarray[g_collidedTile].type == 12)
+							 {
+							   g_backgroundobjarray[g_collidedTile].isalive =0;
+								 g_collidedTile=0;
+                               
+						     }
+					if( g_backgroundobjarray[g_collidedTile].type == 7)
+						{
+							g_backgroundobjarray[g_collidedTile].isalive =0;
+							g_dave_ready_shoot=1;
+						    g_collidedTile=0;
+						}
+					if( g_backgroundobjarray[g_collidedTile].type == 13)
+						{
+							g_start=0;
+						}
+                    }
+                }
+            
+            
+            
+        
+        
+        
+        
+        function f_gravity()
+        {
+			//console.log(g_daveobj.movedown);
+			if(g_daveobj.isalive==1)
+				{
+            if(g_daveobj.moveup ==1 && g_ready_to_jump ==1)
+                {
+					g_jumpflag=1;
+				}
+					if(g_jumpflag==1)
+					{
+                   g_IsdaveOnGround = 0;
+					g_ready_to_jump=0;
+                  g_daveobj.y+=g_initialvelocity;
+                    g_initialvelocity+=g_gravity;
+					f_dave_tile_collision("u");
+					f_dave_tile_collision("d");
+
+                }
+			else if(g_IsdaveOnGround==0 &&( g_daveobj.moveleft == 1 || g_daveobj.moveright == 1))
+				{
+					//g_daveobj.y+=1;
+					 g_daveobj.movedown =1;
+					g_ready_to_jump=0;
+					
+				
+				}
+			
+			if( g_daveobj.moveleft == 1 || g_daveobj.moveright == 1)
+				{
+				  g_daveobj.y+=1;
+				  f_dave_tile_collision("d");
+				}
+			if(  g_daveobj.movedown == 1)
+				{
+				  g_daveobj.y+=5;
+					f_dave_tile_collision("d");
+				}
+				}
+			
+        }
+		
+		
+		
+		function f_dave_shoot()
+		{
+			if(g_dave_ready_shoot==1)
+				{
+					if(g_dave_shoot ==1 && g_bulletobj.isalive==0)
+						{
+							g_dave_shoot=0;
+							g_bulletobj.isalive=1;
+							g_bulletobj.x=g_daveobj.x;
+							g_bulletobj.y=g_daveobj.y;
+							
+							if(g_daveobj.direction==1)
+								{
+									g_bulletobj.speed=5;
+								}
+							else
+								{
+									g_bulletobj.speed=-5;
+								}
+						}
+				}
+				
+						
+		}
+		
+		
+		function c_bullet(l_s,l_img)
+		{
+			 this.x=0;
+			this.y=0;
+			 this.img=l_img;
+			 this.s=l_s;
+			 this.state=0;
+			this.isalive=0;
+			this.speed=0;
+		 	
+			this.m_draw = function m_draw(l_ctx)
+			{
+				if(this.isalive==1)
+					{
+				l_ctx.drawImage(this.img,this.x,this.y,this.s,this.s);
+					}
+			}
+			
+			this.m_move =function m_move()
+			{
+				if(this.isalive==1)
+					{
+				      this.x+=this.speed;
+					}
+			}
+		}
+		
+		
+		
+		function f_monster_bullet_collision()
+		{
+			if(g_bulletobj.isalive==1)
+				{
+					if((g_bulletobj.x+g_bulletobj.s>g_spiderobj.xpos && g_bulletobj.x+g_bulletobj.s<g_spiderobj.xpos+g_spiderobj.size) || (g_bulletobj.x>g_spiderobj.xpos && g_bulletobj.x<g_spiderobj.xpos+g_spiderobj.size) )
+					{
+						if((g_bulletobj.y+g_bulletobj.s>g_spiderobj.ypos && g_bulletobj.y+g_bulletobj.s<g_spiderobj.ypos+g_spiderobj.size)||(g_bulletobj.y>g_spiderobj.ypos && g_bulletobj.y<g_spiderobj.ypos+g_spiderobj.size))
+						{
+							g_spiderobj.isalive=0;
+							g_bulletobj.isalive=0;
+						}
+					}
+				}
+		}
+		
+		function f_dave_monster_collision()
+		{
+			if(g_spiderobj.isalive==1)
+				{
+			//console.log(g_daveobj.x+">>>"+g_spiderobj.xpos);
+			if((g_daveobj.x+g_daveobj.s>g_spiderobj.xpos && g_daveobj.x+g_daveobj.s<g_spiderobj.xpos+g_spiderobj.size) || (g_daveobj.x>g_spiderobj.xpos && g_daveobj.x<g_spiderobj.xpos+g_spiderobj.size) )
+				{
+					console.log("dave moster col 1");
+				  if((g_daveobj.y+g_daveobj.s>g_spiderobj.ypos && g_daveobj.y+g_daveobj.s<g_spiderobj.ypos+g_spiderobj.size)||(g_daveobj.y>g_spiderobj.ypos && g_daveobj.y<g_spiderobj.ypos+g_spiderobj.size))
+					{
+						console.log("dave moster col 2");
+						g_daveobj.isalive=0;
+						g_spiderobj.isalive=0;
+					
+					}
+				}
+				}
+		}
+		
+		function f_when_dave_is_dead()
+		{
+			if(g_daveobj.isalive==0)
+				{
+				  if(g_daveobj.d==3)
+					  {
+					for(j=0;j<g_count;j++)
+						    	{
+								   g_backgroundobjarray[j].x+=g_backgroundobjarray[j].speed;
+								}
+							 g_spiderobj.xpos+=g_spiderobj.speed;
+					  }
+				
+				
+			if(g_map_reached_left==1)
+				{
+					g_daveobj.isalive=1;
+					g_daveobj.x=g_dave_xpos;
+					g_daveobj.y=g_dave_ypos;
+					
+				}
+				}
+		}
+		 function f_scoreboard()
+        {
+					g_context.fillStyle ="RED";
+					g_context.font = "30px Arial";
+            if(g_start ==0)
+                {
+                  g_context.font = "50px Arial";
+                  g_context.fillText("GAME OVER:",400,500);  
+                }
+						
+				     
+        }
+        
+        function f_gameloop()
+        {
+			if(g_start==1)
+				{
+					f_gravity();
+					f_move_map();
+					f_move_spider();
+					f_move_dave();
+					g_bulletobj.m_move(); 
+					f_dave_shoot();
+					f_map_collision();
+					f_dave_monster_collision();
+					f_bullete_tile_collision();
+					f_monster_bullet_collision();
+					f_when_dave_is_dead();
+				}
+					//f_dave_tile_collision();
+					f_clearcanvas();
+			        f_scoreboard();
+					f_draw_map();
+					g_daveobj.m_draw(g_context);
+					g_spiderobj.m_draw(g_context);
+					g_bulletobj.m_draw(g_context);
+				
+			
+            
+        }
+		f_init();
+		var g_daveobj = new c_dave(g_dave_xpos,g_dave_ypos,30,g_dave_forward,g_dave_backward,g_explosion);
+		var g_bulletobj = new c_bullet(10,g_bullet);
+		
+		var g_spider_xpos =g_backgroundobjarray[188].x ;
+		var g_spider_ypos =g_backgroundobjarray[188].y -90;
+		var g_spider_img = new Image();
+		g_spider_img.src='img//monster.png';
+		
+		var g_spiderobj = new c_spider(g_spider_xpos,g_spider_ypos,40,g_explosion,g_spider_img);
+        function f_init()
+		{	
+		   f_init_elements( 0,0,15,55,g_blocksbitmap);
+		}
+        setInterval(f_gameloop,g_timeInterval);
+         document.addEventListener("keydown",f_keyDown);
+         document.addEventListener("keyup",f_keyup);
+    </script>
+  
+<!--
+    Include Scripts here
+
+    
+
+-->
+    
+    
+    
+
+<br /><br />
+
+
+
+<h3>Objective:</h3>
+
+<ul>
+
+    <li>The objective of the game is to collect maximum points and reach the end of the map.</li>
+
+    <li>Contact with fire or water or monster will take dave to the starting point.</li>
+	
+	 <li>Kill the monster using gun ,press space to shoot .</li>
+    
+    <li>The game gets over when dave reaches the end.</li>
+    
+</ul>
+
+<br /><br />
+
+<h3>Logic Design and Implementation:</h3> 
+
+<ul>
+ <li>Map for the game is generated using bitmap .</li>
+
+<li>Write proper logics for movement of dave with respect to the arrow key inputs.</li>
+
+<li>Maintain a separate  classes for dave , monster, bullet.</li>
+
+<li>Bring back dave to initial position when dave is dead using simple logic.</li>
+
+<li>Create logics to determine when the game is over and display it on the screen.</li>
+
+</ul>
+
+<br /><br />
+
+<h3>Scope For Improvement:</h3>
+	
+	<ul><li>Implement score board to the game.</ul>
+
+<ul><li>Implement Audio to the game.</ul>
+<!-- <h3>Scope For Improvement:</h3>
+
+<ul><li>Implement Audio to the game.</ul>
+
+<ul><li>Adding more types of powers and more number of states for the enemies to be in.</ul> -->
+
+  </div>
+
+  <!--content-->
+
+</div> <!-- Container ends here -->
+
+<!--  Footer -->
+
+<div id="info-site">
+
+ </div>
+
+</body>
+
+</html>
